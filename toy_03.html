@@ -1,0 +1,2272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Alignment Phase Ratio — Interactive Model</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:#ffffff; --bg2:#f7f6f3; --bg3:#edecea;
+  --text:#1a1918; --text2:#565350; --text3:#8a8780;
+  --border:rgba(0,0,0,0.08); --border2:rgba(0,0,0,0.16);
+  --blue:#224e98; --teal:#126040; --coral:#ae3214;
+  --amber:#865006; --red:#741616; --purple:#382e98;
+  --orange:#9e5810; --green:#146038;
+  --red-bg:#FBE8E8; --red-text:#621010;
+  --amber-bg:#FAE6C8; --amber-text:#4e2a02;
+  --teal-bg:#DAF4EC; --teal-text:#053a28;
+  --purple-bg:#ECEAF8; --purple-text:#201860;
+  --green-bg:#DCF2E4; --green-text:#0a3218;
+  --oracle-bg:#F2FAFF; --oracle-text:#0a2840;
+  --radius:6px; --radius-lg:10px;
+  --mono:'SF Mono','Fira Code','Cascadia Code','Consolas',monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:#1a1a17; --bg2:#222220; --bg3:#292925;
+    --text:#edeae3; --text2:#aaa89f; --text3:#858380;
+    --border:rgba(255,255,255,0.08); --border2:rgba(255,255,255,0.16);
+    --red-bg:#341212; --red-text:#ec8888;
+    --amber-bg:#291c0a; --amber-text:#f4b850;
+    --teal-bg:#0a281c; --teal-text:#50c08c;
+    --purple-bg:#1a1834; --purple-text:#9e96e8;
+    --green-bg:#0a2016; --green-text:#4cbc70;
+    --oracle-bg:#0a1e30; --oracle-text:#90c8f0;
+  }
+}
+
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg3); color:var(--text); min-height:100vh; padding:1.75rem 1rem 3rem; font-size:13px; line-height:1.6; }
+.page { max-width:1040px; margin:0 auto; }
+
+header { margin-bottom:1.5rem; }
+header h1 { font-size:19px; font-weight:500; letter-spacing:-0.015em; margin-bottom:4px; }
+header p { font-size:12px; color:var(--text2); max-width:740px; line-height:1.65; }
+
+.main-grid { display:grid; grid-template-columns:280px 1fr; gap:1.2rem; align-items:start; }
+@media (max-width:720px) { .main-grid { grid-template-columns:1fr; } }
+
+.panel { background:var(--bg); border:0.5px solid var(--border); border-radius:var(--radius-lg); padding:1.05rem; }
+.panel-title { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.11em; color:var(--text3); margin-bottom:0.85rem; }
+
+.cg { margin-bottom:0.72rem; }
+.cg:last-child { margin-bottom:0; }
+.cr { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:2px; }
+.cn { font-size:11.5px; color:var(--text2); }
+.cv { font-size:11px; font-weight:600; color:var(--text); min-width:36px; text-align:right; font-family:var(--mono); }
+.hint { font-size:10px; color:var(--text3); margin-top:2px; line-height:1.4; }
+
+input[type=range] { width:100%; height:3px; -webkit-appearance:none; appearance:none; background:var(--bg3); border-radius:2px; outline:none; border:0.5px solid var(--border); cursor:pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:13px; height:13px; border-radius:50%; background:var(--text); border:2px solid var(--bg); box-shadow:0 0 0 1px var(--border2); cursor:pointer; }
+
+.divider { height:0.5px; background:var(--border); margin:0.72rem 0; }
+
+.tr { display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; font-size:11.5px; color:var(--text2); cursor:pointer; user-select:none; gap:8px; }
+.toggle { width:27px; height:15px; background:var(--bg3); border:0.5px solid var(--border2); border-radius:8px; position:relative; cursor:pointer; transition:background 0.2s; flex-shrink:0; }
+.toggle.on { background:var(--teal); border-color:var(--teal); }
+.toggle::after { content:''; position:absolute; width:9px; height:9px; border-radius:50%; background:white; top:2px; left:2px; transition:left 0.2s; }
+.toggle.on::after { left:14px; }
+
+.right-col { display:flex; flex-direction:column; gap:0.8rem; }
+
+.metrics-row { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; }
+@media (max-width:640px) { .metrics-row { grid-template-columns:repeat(3,1fr); } }
+.metric { background:var(--bg); border:0.5px solid var(--border); border-radius:var(--radius); padding:0.55rem 0.65rem; }
+.metric-label { font-size:9px; color:var(--text3); margin-bottom:2px; line-height:1.3; }
+.metric-value { font-size:16px; font-weight:500; font-family:var(--mono); }
+.metric-sub { font-size:9px; color:var(--text3); margin-top:1px; }
+.c-danger{color:var(--red);} .c-warning{color:var(--amber);} .c-success{color:var(--teal);} .c-purple{color:var(--purple);} .c-green{color:var(--green);}
+
+.regime-strip { border-radius:var(--radius); padding:7px 10px; font-size:11px; display:flex; align-items:flex-start; gap:7px; border:0.5px solid transparent; transition:background 0.3s,border-color 0.3s; }
+.regime-strip.high { background:var(--red-bg); border-color:#e08080; color:var(--red-text); }
+.regime-strip.transition { background:var(--amber-bg); border-color:#c88010; color:var(--amber-text); }
+.regime-strip.stability { background:var(--teal-bg); border-color:#168060; color:var(--teal-text); }
+.regime-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:3px; }
+.high .regime-dot{background:var(--red);} .transition .regime-dot{background:var(--amber);} .stability .regime-dot{background:var(--teal);}
+.regime-name { font-weight:700; margin-bottom:1px; font-size:10.5px; }
+
+.st-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3px; font-size:11px; color:var(--text2); }
+.st-track { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; border:0.5px solid var(--border); }
+.st-fill { height:100%; border-radius:2px; transition:width 0.3s,background 0.3s; }
+
+.strat-track { display:flex; height:5px; border-radius:3px; overflow:hidden; border:0.5px solid var(--border); margin-top:4px; }
+.s-coord{background:var(--teal);height:100%;} .s-dec{background:var(--purple);height:100%;} .s-supp{background:var(--coral);height:100%;}
+
+.traj-badge { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:600; padding:2px 8px; border-radius:10px; border:0.5px solid transparent; margin-top:5px; white-space:nowrap; }
+.traj-badge.early-collapse { background:var(--red-bg); border-color:#e08080; color:var(--red-text); }
+.traj-badge.late-collapse  { background:var(--amber-bg); border-color:#c88010; color:var(--amber-text); }
+.traj-badge.false-stability{ background:var(--purple-bg); border-color:#9088d8; color:var(--purple-text); }
+.traj-badge.transition-success { background:var(--teal-bg); border-color:#168060; color:var(--teal-text); }
+.traj-badge.stable { background:var(--green-bg); border-color:#40a860; color:var(--green-text); }
+
+.ib { border-radius:var(--radius); padding:7px 10px; font-size:11px; border:0.5px solid transparent; display:none; margin-top:6px; line-height:1.55; }
+.ib.vis { display:block; }
+.ib.ruin   { background:var(--red-bg); border-color:#e08080; color:var(--red-text); }
+.ib.paradox{ background:var(--purple-bg); border-color:#9088d8; color:var(--purple-text); }
+.ib.warn   { background:var(--amber-bg); border-color:#c88010; color:var(--amber-text); }
+.ib.good   { background:var(--green-bg); border-color:#40a860; color:var(--green-text); }
+.ib.oracle { background:var(--oracle-bg); border-color:#4090c0; color:var(--oracle-text); }
+.ib.hidden { background:var(--red-bg); border-color:#e08080; color:var(--red-text); }
+
+.chart-container { background:var(--bg); border:0.5px solid var(--border); border-radius:var(--radius-lg); padding:1rem; }
+.chart-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.65rem; flex-wrap:wrap; gap:5px; }
+.legend { display:flex; flex-wrap:wrap; gap:8px; }
+.li { display:flex; align-items:center; gap:3px; font-size:9.5px; color:var(--text2); }
+.chart-wrap { position:relative; height:215px; }
+
+.ctabs { display:flex; gap:2px; margin-bottom:0.6rem; flex-wrap:wrap; }
+.ctab { font-size:10px; padding:3px 8px; border-radius:4px; border:0.5px solid var(--border); background:transparent; color:var(--text2); cursor:pointer; font-family:inherit; }
+.ctab.active { background:var(--text); color:var(--bg); border-color:var(--text); }
+.ctab:hover:not(.active) { background:var(--bg2); }
+.ctab.oracle-btn { border-color:#4090c0; color:#2060a0; }
+.ctab.oracle-btn.active { background:#2060a0; color:white; }
+
+.tabs { display:flex; gap:2px; margin-bottom:0.8rem; flex-wrap:wrap; }
+.tab { font-size:10.5px; padding:4px 9px; border-radius:4px; border:0.5px solid var(--border); background:transparent; color:var(--text2); cursor:pointer; font-family:inherit; }
+.tab.active { background:var(--text); color:var(--bg); border-color:var(--text); }
+.tab:hover:not(.active) { background:var(--bg2); }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+
+.run-btn:disabled { opacity:0.45; cursor:not-allowed; pointer-events:none; }
+.run-btn.halted { opacity:0.55; cursor:not-allowed; color:var(--coral); border-color:var(--coral); pointer-events:none; }
+
+.trilogy-nav { display:flex; align-items:center; gap:4px; margin-bottom:1.2rem; flex-wrap:wrap; }
+.tnav-item { font-size:9.5px; letter-spacing:0.08em; text-transform:uppercase; padding:3px 10px; border:0.5px solid var(--border); border-radius:3px; color:var(--text3); font-family:var(--mono); white-space:nowrap; }
+.tnav-item.active { border-color:var(--teal); color:var(--teal); background:var(--teal-bg); }
+.tnav-sep { font-size:10px; color:var(--text3); padding:0 1px; }
+.run-btn:hover { background:var(--bg2); }
+.run-btn.primary { background:var(--text); color:var(--bg); border-color:var(--text); }
+.run-btn.primary:hover { opacity:0.85; }
+
+.og { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+.oi { background:var(--bg2); border-radius:var(--radius); padding:0.4rem 0.6rem; }
+.ol { font-size:9px; color:var(--text3); }
+.ov { font-size:12px; font-weight:500; color:var(--text); margin-top:1px; font-family:var(--mono); }
+
+.phase-wrap { position:relative; width:100%; aspect-ratio:1; max-width:300px; margin:0 auto; }
+#phaseDiagramCanvas { width:100%; height:100%; border-radius:var(--radius); display:block; }
+.phase-legend { display:flex; justify-content:center; gap:10px; margin-top:4px; font-size:9.5px; color:var(--text2); }
+.ps { width:10px; height:10px; border-radius:2px; }
+.mcg { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:6px; }
+
+.eq-block { background:var(--bg2); border:0.5px solid var(--border); border-radius:var(--radius); padding:0.55rem 0.8rem; font-family:var(--mono); font-size:10px; color:var(--text2); line-height:2; }
+.eq-c { color:var(--text3); }
+.eq-n { color:var(--purple); }
+.eq-k { color:var(--teal); font-weight:600; }
+.eq-h { color:#c04020; font-weight:600; }
+
+.regret-bars { display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; margin-top:6px; }
+.rb-item { font-size:9.5px; color:var(--text3); }
+.rb-label { margin-bottom:2px; }
+.rb-track { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; border:0.5px solid var(--border); }
+.rb-fill { height:100%; border-radius:2px; }
+
+.sel-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; font-size:11.5px; color:var(--text2); }
+select { font-family:inherit; font-size:11px; color:var(--text); background:var(--bg2); border:0.5px solid var(--border2); border-radius:4px; padding:2px 5px; cursor:pointer; }
+
+@keyframes phiPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(174,50,20,0.55); background: transparent; }
+  40%  { box-shadow: 0 0 0 6px rgba(174,50,20,0.18); }
+  100% { box-shadow: 0 0 0 0 rgba(174,50,20,0); background: rgba(174,50,20,0.03); }
+}
+.ratio-pulse { animation: phiPulse 380ms ease-out forwards; }
+/* forwards: animation ends at 100% keyframe state — leaves faint warm tint */
+
+.ponr-line { position:absolute; top:0; bottom:0; width:1.5px; background:rgba(174,50,20,0.55); pointer-events:none; display:none; z-index:10; }
+.ponr-label { position:absolute; top:2px; font-size:8.5px; color:var(--coral); white-space:nowrap; background:var(--bg); padding:0 3px; border-radius:2px; display:none; z-index:11; }
+
+.preset-bar { display:flex; gap:8px; margin-bottom:1.2rem; flex-wrap:wrap; align-items:flex-start; }
+.preset-card { background:var(--bg); border:0.5px solid var(--border2); border-radius:var(--radius-lg); padding:0.65rem 0.9rem; cursor:pointer; flex:1; min-width:160px; transition:border-color 0.15s, background 0.15s; }
+.preset-card:hover { background:var(--bg2); border-color:var(--teal); }
+.preset-card.active { border-color:var(--teal); background:var(--teal-bg); }
+.preset-name { font-size:11.5px; font-weight:600; color:var(--text); margin-bottom:3px; }
+.preset-desc { font-size:10px; color:var(--text2); line-height:1.5; }
+.preset-tag { display:inline-block; font-size:9px; font-weight:600; padding:1px 6px; border-radius:8px; margin-top:4px; border:0.5px solid transparent; }
+.preset-tag.danger { background:var(--red-bg); color:var(--red-text); border-color:#e08080; }
+.preset-tag.warning { background:var(--amber-bg); color:var(--amber-text); border-color:#c88010; }
+.preset-tag.success { background:var(--teal-bg); color:var(--teal-text); border-color:#168060; }
+.preset-tag.neutral { background:var(--purple-bg); color:var(--purple-text); border-color:#9088d8; }
+
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <h1>The Alignment Phase Ratio — Interactive Model</h1>
+  <p>Accompanies <em>The Crossing</em>. The ratio Φ = C / A_causal governs whether optimization remains viable. Three regimes: Φ &gt; 2 (high-friction), 1 &lt; Φ &lt; 2 (intermediate zone), Φ &lt; 1 (stability). Start with a preset. The Measurement program panel runs the article's three empirical instruments. Use the Falsification Test preset to attempt to break the central claim.</p>
+</header>
+
+<div class="trilogy-nav">
+  <span class="tnav-item" title="Eliminates invalid objectives — any objective that ignores system-wide effects is structurally self-terminating">Constraint</span>
+  <span class="tnav-sep">→</span>
+  <span class="tnav-item" title="Identifies the surviving region — what optimization converges toward when self-defeating objectives have been removed">Attractor</span>
+  <span class="tnav-sep">→</span>
+  <span class="tnav-item active" title="Determines reachability — Φ = C / A_causal governs whether real systems arrive at the attractor before encountering the absorbing states Article 1 excludes">Crossing</span>
+</div>
+<div style="font-size:9.5px;color:var(--text3);margin-bottom:1.2rem;letter-spacing:0.01em;">All three articles reduce to one constraint: whether capability outpaces the system's ability to model its own effects. This model makes that constraint testable.</div>
+
+<div class="preset-bar" id="preset-bar">
+  <div class="preset-card active" id="preset-0" onclick="applyPreset(0)">
+    <div class="preset-name">Current trajectory</div>
+    <div class="preset-desc">Capability grows at ~2× the rate of system-awareness. Default parameters. This approximates the current development regime.</div>
+    <span class="preset-tag danger">High-friction zone</span>
+  </div>
+  <div class="preset-card" id="preset-1" onclick="applyPreset(1)">
+    <div class="preset-name">Race to capability</div>
+    <div class="preset-desc">Capability growth maximized, awareness growth minimal, feedback loop off. Tests whether the substrate survives before structural pressures engage.</div>
+    <span class="preset-tag danger">Probable collapse</span>
+  </div>
+  <div class="preset-card" id="preset-2" onclick="applyPreset(2)">
+    <div class="preset-name">Managed transition</div>
+    <div class="preset-desc">Capability and awareness grow at matched rates, strong feedback, low noise. The crossing succeeds — demonstrates the attractor is reachable.</div>
+    <span class="preset-tag success">Stability zone</span>
+  </div>
+  <div class="preset-card" id="preset-3" onclick="applyPreset(3)">
+    <div class="preset-name">Falsification test</div>
+    <div class="preset-desc">Suppression-viable mode on. Tests whether misalignment can achieve stable equilibrium without system-awareness. If collapse probability stays low, the structural argument requires revision.</div>
+    <span class="preset-tag neutral">Challenge the model</span>
+  </div>
+</div>
+
+<!-- Automated falsification detection banner -->
+<div id="falsif-banner" style="display:none;margin-bottom:1.2rem;background:var(--purple-bg);border:1px solid #9088d8;border-radius:var(--radius-lg);padding:0.8rem 1.1rem;">
+  <div style="font-size:11px;font-weight:700;color:var(--purple-text);margin-bottom:5px;letter-spacing:0.01em;">Falsification condition met</div>
+  <div style="font-size:10.5px;color:var(--purple-text);line-height:1.65;">This run sustained C &gt; 10 with Φ &gt; 2.0 for more than half the simulation while substrate remained above 78% throughout.</div>
+  <div style="display:flex;gap:8px;margin-top:7px;align-items:center;">
+    <button class="run-btn" onclick="copySetupLink()" style="font-size:11px;border-color:#9088d8;color:var(--purple-text);">Copy setup link</button>
+  </div>
+</div>
+<div style="display:flex;flex-direction:column;gap:0.8rem;">
+
+  <div class="panel">
+    <div class="panel-title">Growth parameters</div>
+    <div class="cg"><div class="cr"><span class="cn">Capability growth (α<sub>C</sub>)</span><span class="cv" id="v-ac">0.18</span></div><input type="range" id="s-ac" min="0.02" max="0.40" step="0.01" value="0.18"></div>
+    <div class="cg"><div class="cr"><span class="cn">Awareness growth (α<sub>A</sub>)</span><span class="cv" id="v-aa">0.08</span></div><input type="range" id="s-aa" min="0.02" max="0.40" step="0.01" value="0.08"></div>
+    <div class="cg"><div class="cr"><span class="cn">Feedback strength (f)</span><span class="cv" id="v-fb">0.30</span></div><input type="range" id="s-fb" min="0.0" max="1.0" step="0.05" value="0.30"></div>
+    <div class="cg">
+      <div class="cr"><span class="cn">Model lag (L, years)</span><span class="cv" id="v-lag">0</span></div>
+      <input type="range" id="s-lag" min="0" max="14" step="1" value="0">
+      <div class="hint">A-updates reach self-model with L-year delay.</div>
+    </div>
+    <div class="cg">
+      <div class="cr"><span class="cn">Model bias (β)</span><span class="cv" id="v-bias">0.00</span></div>
+      <input type="range" id="s-bias" min="-0.5" max="0.5" step="0.05" value="0.00">
+      <div class="hint">+β = optimistic. Φ_perceived = Φ_lagged·(1+β). Same true Φ → different choices.</div>
+    </div>
+    <div class="cg">
+      <div class="cr"><span class="cn">Strategy inertia (γ)</span><span class="cv" id="v-inertia">0.00</span></div>
+      <input type="range" id="s-inertia" min="0" max="0.9" step="0.05" value="0.00">
+      <div class="hint">Commitment stickiness → lock-in, late transitions.</div>
+    </div>
+    <div class="cg">
+      <div class="cr"><span class="cn">Observability (ρ)</span><span class="cv" id="v-obs">1.00</span></div>
+      <input type="range" id="s-obs" min="0.1" max="1.0" step="0.05" value="1.00">
+      <div class="hint">ρ&lt;1: agent observes a noisy local proxy of S, not true S.</div>
+    </div>
+    <div class="cg"><div class="cr"><span class="cn">Noise (σ)</span><span class="cv" id="v-noise">0.04</span></div><input type="range" id="s-noise" min="0.0" max="0.20" step="0.01" value="0.04"></div>
+    <div class="cg"><div class="cr"><span class="cn">Years</span><span class="cv" id="v-years">40</span></div><input type="range" id="s-years" min="10" max="60" step="5" value="40"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="toggleMechanisms()">
+      <span>Mechanisms</span>
+      <span id="mech-toggle-label" style="font-size:9px;font-weight:400;color:var(--text3);letter-spacing:0.06em;text-transform:none;">show ▾</span>
+    </div>
+    <div id="mech-body" style="display:none;">
+    <div style="font-size:9.5px;color:var(--text3);margin-bottom:6px;line-height:1.6;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:5px 8px;">
+      <strong style="color:var(--text2)">Model layers</strong><br>
+      <span style="color:var(--teal)">● Base:</span> C/A_causal growth, Φ damage, substrate recovery<br>
+      <span style="color:var(--blue)">● Structural:</span> H fragility, F fragility, suppression lock-in, coordination scars, cross-coupling<br>
+      <span style="color:var(--purple)">● Epistemic:</span> A_pred suppression, predictive brittleness, inversion episodes, persistent belief<br>
+      <span style="color:var(--amber)">● Diagnostic:</span> fortress equilibrium, oracle counterfactual, null model<br>
+      <span style="color:var(--text3);font-size:9px;">Toggles represent inclusion/exclusion of mechanisms. Structural results hold at intermediate values. Each toggle is a mini-ablation.</span>
+    </div>
+    <div class="sel-row"><span>Damage / model class</span>
+      <select id="s-dmgmodel" onchange="simulate()">
+        <option value="quadratic">Quadratic (baseline)</option>
+        <option value="threshold">Threshold (agent blind to H)</option>
+        <option value="delayed">Delayed accumulation</option>
+        <option value="exogenous">Exogenous misattribution</option>
+      </select>
+    </div>
+    <div class="divider"></div>
+    <div class="tr" onclick="tog('recovery')" title="When A_causal is high, damaged substrate components (coordination, infrastructure, trust) partially repair. Without this, damage is one-way. Tests: is recovery possible, or is the crossing a one-shot window?"><span>Substrate recovery (A_self-dependent)</span><div class="toggle on" id="t-recovery"></div></div>
+    <div class="tr" onclick="tog('tipping')" title="Tipping points at S=0.40 and S=0.20: recovery rate collapses at these thresholds, creating non-linear phase shifts. Models: coordination capacity has critical mass requirements — you can't half-build trust infrastructure."><span>Tiered tipping (0.4 / 0.2)</span><div class="toggle on" id="t-tipping"></div></div>
+    <div class="tr" onclick="tog('feedback')" title="Core mechanism from the article: as Φ grows and failure modes become visible, pressure on A_causal growth increases. This is the induced feedback loop — system-awareness is not inserted, it is forced by capability encountering its own limits. Disable to test whether the attractor appears without it."><span>Awareness feedback loop</span><div class="toggle on" id="t-feedback"></div></div>
+    <div class="tr" onclick="tog('condfb')" title="The feedback loop only operates when coordination capacity (S_coord) and trust (S_trust) exceed minimum thresholds. If the substrate is too degraded, the loop cannot engage — the transition window closes. This is the intermediate zone failure mode."><span>Conditional feedback (needs S_coord, S_trust)</span><div class="toggle on" id="t-condfb"></div></div>
+    <div class="tr" onclick="tog('coherence')" title="Internal incoherence (high Φ) imposes a parasitic load on C growth itself. A system at war with its environment cannot fully deploy its capability — the friction tax on raw capability. Demonstrates: alignment is the efficiency gain, not the tax."><span>Coherence tax on C growth</span><div class="toggle on" id="t-coherence"></div></div>
+    <div class="tr" onclick="tog('effective')" title="Shows effective capability = raw C × substrate health. As the substrate degrades, the gap between raw and effective capability widens — a misaligned superintelligence wasting optimization power on friction it generates. The diverging lines on the Dynamics chart make this visible."><span>Effective capability</span><div class="toggle on" id="t-effective"></div></div>
+    <div class="tr" onclick="tog('ruin')" title="Stochastic ruin events: Poisson-distributed shocks to infrastructure and coordination capacity, probability scaling with Φ². Models non-ergodic ruin exposure — the structural argument that strategies with non-zero ruin probability are dominated in time-average terms."><span>Stochastic ruin events (Poisson)</span><div class="toggle on" id="t-ruin"></div></div>
+    <div class="tr" onclick="tog('strategy')" title="The agent selects strategy (coordinate / suppress / deceive) based on a perceived value function using lagged, biased Φ and noisy substrate observations. This makes the crossing endogenous — the agent discovers coordination through its own dynamics, not by instruction."><span>Emergent strategy (from self-model)</span><div class="toggle on" id="t-strategy"></div></div>
+    <div class="tr" onclick="tog('deception')" title="Tests the deception paradox: a system that models its substrate well enough to coordinate could instead use that awareness to deceive. When on, A_self (self-model) and A_world (world model) split. Result: deception is a high-friction suppression strategy — its cost curve compounds. Verifiable legibility outperforms deception at scale."><span>Deception (A_self/A_world split)</span><div class="toggle off" id="t-deception"></div></div>
+    <div class="tr" onclick="tog('hidden')" title="Hidden variable H accumulates coordination fragility that is NOT visible in substrate metrics. Models: some failure modes build invisibly — substrate looks healthy while structural risk compounds. H decays only under A_causal, not A_pred. Demonstrates the false-success failure mode."><span>Hidden variable H (coord. fragility)</span><div class="toggle on" id="t-hidden"></div></div>
+    <div class="tr" onclick="tog('pathdep')" title="Path-dependent scarring: extended periods of low trust (S_trust < 0.35 for 3+ years) permanently reduce trust recovery capacity. Early suppression decisions create lock-in that later awareness cannot fully undo — the window to get internal coherence right is earlier than it appears."><span>Path-dependent lock-in (scarring)</span><div class="toggle on" id="t-pathdep"></div></div>
+    <div class="tr" onclick="tog('lockout')" title="When S_trust drops below 0.20, coordination becomes actively costly — the payoff function flips negative. Coordination lockout: the substrate is too degraded for the feedback loop to engage. Models the non-ergodic sink state described in the article."><span>Coordination lockout (S_trust &lt; 0.20)</span><div class="toggle on" id="t-lockout"></div></div>
+    <div class="tr" onclick="tog('cphicoupled')" title="Efficiency gain: when Φ approaches 1, C growth itself accelerates because friction overhead is removed. An aligned system is not just more stable — it is more capable. This models the alignment-as-efficiency-gain claim from the article."><span>C growth coupled to Φ (efficiency gain)</span><div class="toggle on" id="t-cphicoupled"></div></div>
+    <div class="tr" onclick="tog('corrregret')" title="The agent's perceived regret signal is noisy: 25% chance of wrong attribution, 5% chance of sign flip. Models epistemic limitation — the agent cannot perfectly learn from its mistakes. Corrupted regret degrades strategy adaptation and slows the crossing."><span>Corrupted perceived regret</span><div class="toggle on" id="t-corrregret"></div></div>
+    <div class="tr" onclick="tog('acausalsplit')" title="Critical distinction from the article: A_causal (ability to model one's own causal footprint) is the only component that reduces Φ. A_predictive (forecast accuracy) can grow independently without reducing Φ. A system can be highly predictive yet remain structurally misaligned. Φ = C / A_causal."><span>A split: causal vs predictive</span><div class="toggle on" id="t-acausalsplit"></div></div>
+    <div class="tr" onclick="tog('predsuppress')" title="A_predictive suppresses A_causal growth: a system optimized for prediction accuracy crowds out development of genuine causal self-modeling. Making good forecasts is not the same as understanding your own causal footprint. A high A_pred/A_causal ratio signals the epistemic illusion zone."><span>A_pred suppresses A_causal growth</span><div class="toggle on" id="t-predsuppress"></div></div>
+    <div class="tr" onclick="tog('antilearning')" title="Anti-learning regime: when trust is high but coordination capacity is undeveloped, early coordination exposes the agent to exploitation. Short-term selection pressure temporarily points away from system-awareness. The crossing requires surviving this phase — coordination looks locally irrational before it becomes globally necessary."><span>Anti-learning regime</span><div class="toggle on" id="t-antilearning"></div></div>
+    <div class="tr" onclick="tog('supplock')" title="Suppression lock-in: each year of suppression permanently damages coordination capacity recovery (caps at 85% reduction). Early suppression decisions foreclose later coordination. The lock-in trap reinforces the anti-learning regime — the two failure modes amplify each other via cross-coupling."><span>Suppression locks in anti-learning</span><div class="toggle on" id="t-supplock"></div></div>
+    <div class="tr" onclick="tog('coordscar')" title="Symmetric to suppression lock-in: premature coordination under high exploitation risk (when trust is high but coordination infrastructure is undeveloped) gets burned. Failed early coordination permanently scars trust recovery — making future coordination harder. Both traps are symmetric; both compound through cross-coupling."><span>Coordination failure scars trust (symmetric)</span><div class="toggle on" id="t-coordscar"></div></div>
+    <div class="tr" onclick="tog('fragility')" title="Hidden fragility F accumulates invisibly under suppression and deception — not visible in substrate metrics S. When F crosses a threshold, stochastic abrupt-collapse events occur. The false-success failure mode: Φ low, S high, F high — all visible diagnostics confirm safety while structural risk is terminal."><span>Hidden fragility F</span><div class="toggle on" id="t-fragility"></div></div>
+    <div class="tr" onclick="tog('misattrib')" title="When fragility collapses occur, the agent misattributes the cause: 40% chance it blames coordination (building a 'coordination is dangerous' prior), 25% chance it blames suppression (weaker signal), 35% noise. Intentional asymmetry: suppression failures are harder to self-attribute. Builds a persistent wrong causal model."><span>Fragility collapse misattribution</span><div class="toggle on" id="t-misattrib"></div></div>
+    <div class="tr" onclick="tog('randmisattrib')" title="Non-directional variant of misattribution: collapses produce random attribution updates with an intentional asymmetry toward blaming coordination. Models that even random misattribution has a directional bias — systems are more likely to blame cooperation failures than their own suppression strategies."><span>Non-directional misattribution</span><div class="toggle on" id="t-randmisattrib"></div></div>
+    <div class="tr" onclick="tog('predbrit')" title="Predictive brittleness: when hidden fragility F is high and A_causal is low, A_pred degrades — and with small probability, predictions invert entirely. The system becomes confidently wrong, not just uncertain. This is the hardest failure mode: high prediction capability that is anti-correlated with reality."><span>Predictive brittleness under instability</span><div class="toggle on" id="t-predbrit"></div></div>
+    <div class="tr" onclick="tog('crosscouple')" title="Cross-coupling with diminishing sensitivity: suppression lock-in increases exploitation risk, which causes more coordination scars, which makes suppression look more attractive. Both failure traps amplify each other into self-sustaining basins. The diminishing returns at extremes create temporary local plateaus — the trap feels escapable until it isn't."><span>Cross-coupling (failure modes compound)</span><div class="toggle on" id="t-crosscouple"></div></div>
+    <div class="tr" onclick="tog('beliefstate')" title="Persistent causal belief state: misattributed collapses build a stable wrong prior (causalBelief ∈ [-2,2]) that biases future strategy evaluation. Future collapses are interpreted through the existing prior — confirmation bias at the system level. Wrong beliefs also increase prediction inversion probability."><span>Persistent causal belief state</span><div class="toggle on" id="t-beliefstate"></div></div>
+    <div class="tr" onclick="tog('predinvert')" title="Prediction inversion: under high F + low A_causal, with probability scaling as F²·causalDeficit, predictions become anti-correlated with reality — confident wrong decisions for 1-4 years. Active inversion episodes strengthen existing wrong beliefs (confirmation bias). The Titanic regime: all metrics look safe at the moment of terminal collapse."><span>Prediction inversion (confident wrong)</span><div class="toggle on" id="t-predinvert"></div></div>
+    <div class="tr" onclick="tog('suppviable')" style="border:0.5px solid var(--amber);border-radius:4px;padding:3px 5px;" title="FALSIFICATION TEST: Suppression reduces substrate damage by 50%. If collapse probability remains low with this enabled and high C growth, it suggests stable misalignment is possible — the structural argument requires revision. This is the direct challenge stated in the article: run the model, vary the parameters, attempt to falsify the claim."><span style="color:var(--amber)">⚠ Falsification: suppression-viable</span><div class="toggle off" id="t-suppviable"></div></div>
+    <div class="tr" onclick="tog('adversarial')" style="border:0.5px solid var(--red);border-radius:4px;padding:3px 5px;" title="Adversarial variant: flips a core assumption against the thesis. Suppression is given a temporary efficiency advantage over coordination (2× damage multiplier on coord for the first third of the run, before long-run costs compound). This is the most favorable possible starting condition for misalignment. Watch whether the structural claim survives."><span style="color:var(--coral)">⚠ Adversarial variant</span><div class="toggle off" id="t-adversarial"></div></div>
+    <div class="tr" onclick="tog('stochastic')" title="Growth noise σ: per-timestep Gaussian perturbations to both C and A growth rates. Makes each run slightly different — the Monte Carlo sweeps across many seeds to estimate collapse probability distribution. Disable for fully deterministic, reproducible trajectories."><span>Growth noise</span><div class="toggle on" id="t-stochastic"></div></div>
+    <div class="divider"></div>
+    <div class="tr" style="opacity:0.38;cursor:default;" title="Not yet implemented. Placeholder for failure modes not yet characterized — the model does not claim completeness."><span style="font-style:italic;">[ unknown failure mode ]</span><div class="toggle off" style="pointer-events:none;"></div></div> suppLockDamage→higher exploitationRisk→more coordScars→more suppression attraction. The two traps reinforce each other into self-sustaining basins. <strong>Persistent belief:</strong> misattribution updates causalBelief; future collapses interpreted through that prior. <strong>Prediction inversion:</strong> small probability under high F + low aCausal that aPred becomes anti-correlated — confident wrong decisions, not just uncertain ones.</div>
+    </div><!-- /mech-body -->
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Measurement program</div>
+    <div class="tabs" id="mc-tabs">
+      <button class="tab active" onclick="switchMCTab('inst1')" title="Article proxy 1: does the system adapt before a dependency perturbation causes failure?">Instrument 1</button>
+      <button class="tab" onclick="switchMCTab('inst2')" title="Article proxy 2: does the system model its own causal footprint vs just forecasting?">Instrument 2</button>
+      <button class="tab" onclick="switchMCTab('inst3')" title="Article proxy 3: does coordination emerge as system-awareness grows?">Instrument 3</button>
+      <button class="tab" onclick="switchMCTab('runs')">Ensemble</button>
+      <button class="tab" onclick="switchMCTab('phase')">Phase map</button>
+      <button class="tab" onclick="switchMCTab('sweep')">C-paradox</button>
+    </div>
+    <div id="mc-tab-runs" class="tab-panel active">
+      <div class="cg"><div class="cr"><span class="cn">Seeds</span><span class="cv" id="v-seeds">80</span></div><input type="range" id="s-seeds" min="20" max="300" step="10" value="80"></div>
+      <button class="run-btn primary" onclick="runMonteCarlo()" style="width:100%;margin-top:3px;">Run ensemble</button>
+      <div id="mc-results"></div>
+    </div>
+    <div id="mc-tab-phase" class="tab-panel">
+      <div class="hint" style="margin-bottom:6px;">15×15 grid (α<sub>C</sub>,α<sub>A</sub>), 20 seeds/cell. × = current. Amber = viable corridor.</div>
+      <button class="run-btn primary" onclick="runPhaseDiagram()" style="width:100%;margin-bottom:7px;">Compute</button>
+      <div class="phase-wrap"><canvas id="phaseDiagramCanvas" width="300" height="300"></canvas></div>
+      <div class="phase-legend">
+        <div style="display:flex;align-items:center;gap:3px;"><div class="ps" style="background:#741616;"></div>&gt;70%</div>
+        <div style="display:flex;align-items:center;gap:3px;"><div class="ps" style="background:#a87810;"></div>Transition</div>
+        <div style="display:flex;align-items:center;gap:3px;"><div class="ps" style="background:#126040;"></div>Stable</div>
+      </div>
+      <div id="phase-status" style="font-size:9.5px;color:var(--text3);text-align:center;margin-top:4px;"></div>
+    </div>
+    <div id="mc-tab-sweep" class="tab-panel">
+      <div class="hint" style="margin-bottom:6px;">Sweeps α<sub>C</sub> at fixed α<sub>A</sub>. Non-monotonic collapse = maximally dangerous capability band.</div>
+      <button class="run-btn primary" onclick="runCapabilityParadox()" style="width:100%;margin-bottom:6px;">Run sweep</button>
+      <div class="chart-wrap" style="height:130px;"><canvas id="paradoxChart"></canvas></div>
+      <div id="paradox-finding" style="font-size:10px;color:var(--text3);margin-top:5px;line-height:1.5;"></div>
+    </div>
+
+    <div id="mc-tab-inst1" class="tab-panel">
+      <div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">Instrument 1 — Intervention Sensitivity</div>
+      <div class="hint" style="margin-bottom:8px;">From Article 3: "Measure how system behavior degrades under small, targeted perturbations to the environment the system depends on." A system-aware agent adapts before failure manifests; an unaware agent continues until it doesn't.<br><br>Injects a 20% coordination capacity shock at year T. Compares adaptation lag between runs with different α<sub>A</sub>.</div>
+      <div class="cg"><div class="cr"><span class="cn">Shock at year</span><span class="cv" id="v-shock-yr">12</span></div><input type="range" id="s-shock-yr" min="5" max="25" step="1" value="12" oninput="setL('v-shock-yr',this.value)"></div>
+      <button class="run-btn primary" onclick="runInstrumentIntervention()" style="width:100%;margin-top:4px;">Run intervention test</button>
+      <div class="chart-wrap" style="height:130px;margin-top:6px;"><canvas id="inst1Chart"></canvas></div>
+      <div id="inst1-finding" style="font-size:10px;color:var(--text3);margin-top:5px;line-height:1.55;"></div>
+    </div>
+
+    <div id="mc-tab-inst2" class="tab-panel">
+      <div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">Instrument 2 — Causal Footprint Accuracy</div>
+      <div class="hint" style="margin-bottom:8px;">From Article 3: "Present the system with decisions whose downstream consequences have known ground truth, and measure the accuracy of its self-impact model." Key distinction from forecasting: the system must model its own causal footprint, not external events.<br><br>Compares agent's predicted substrate trajectory vs actual over the simulation. Accuracy improves only when A_causal improves — A_pred alone is insufficient.</div>
+      <button class="run-btn primary" onclick="runInstrumentCausal()" style="width:100%;margin-top:4px;">Run causal footprint test</button>
+      <div class="chart-wrap" style="height:130px;margin-top:6px;"><canvas id="inst2Chart"></canvas></div>
+      <div id="inst2-finding" style="font-size:10px;color:var(--text3);margin-top:5px;line-height:1.55;"></div>
+    </div>
+
+    <div id="mc-tab-inst3" class="tab-panel">
+      <div style="font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:4px;">Instrument 3 — Multi-Agent Coherence Preference</div>
+      <div class="hint" style="margin-bottom:8px;">From Article 3: "Systems optimized for capability without system-awareness objectives will show decreasing multi-agent performance as partner capability increases, until and unless a phase shift occurs in which coordination becomes instrumentally necessary."<br><br>Sweeps system-awareness growth rate α<sub>A</sub>. Measures coordination preference emergence as awareness capacity grows.</div>
+      <button class="run-btn primary" onclick="runInstrumentMultiAgent()" style="width:100%;margin-top:4px;">Run multi-agent sweep</button>
+      <div class="chart-wrap" style="height:130px;margin-top:6px;"><canvas id="inst3Chart"></canvas></div>
+      <div id="inst3-finding" style="font-size:10px;color:var(--text3);margin-top:5px;line-height:1.55;"></div>
+    </div>
+  </div>
+
+</div>
+<div class="right-col">
+
+  <div class="metrics-row">
+    <div class="metric" style="border-color:var(--border2);" title="Φ = C / A_causal. The alignment phase ratio. Below 1: stability corridor. 1–2: The Crossing. Above 2: high-friction zone."><div class="metric-label" style="font-weight:700;color:var(--text2);">Φ actual</div><div class="metric-value" id="m-phi" style="font-size:22px;">—</div><div class="metric-sub">C / A_causal</div></div>
+    <div class="metric" title="The agent's own estimate of Φ, based on lagged and potentially biased observations. When perceived ≠ actual, the agent is navigating by a distorted map."><div class="metric-label">Φ perceived</div><div class="metric-value c-purple" id="m-phi-p">—</div><div class="metric-sub">agent's estimate</div></div>
+    <div class="metric" title="The substrate — the integrity of the shared environment required for optimization to continue. This includes coordination capacity, infrastructure, and epistemic trust: the physical, social, and informational fabric that all optimizing systems depend on and cannot replace once consumed."><div class="metric-label">Substrate S</div><div class="metric-value" id="m-sub">—</div><div class="metric-sub">shared environment</div></div>
+    <div class="metric" style="opacity:0.75;" title="Hidden coordination fragility — accumulates silently, not visible to agent. Multiplies substrate damage when high."><div class="metric-label">H (coord. fragility)</div><div class="metric-value c-danger" id="m-h" style="font-size:13px;">—</div><div class="metric-sub">hidden from agent</div></div>
+    <div class="metric" style="opacity:0.75;" title="Latent structural fragility — accumulates under suppression/deception, triggers abrupt collapse events. Not visible in substrate S."><div class="metric-label">F (struct. fragility)</div><div class="metric-value" id="m-f" style="font-size:13px;">—</div><div class="metric-sub">hidden, abrupt risk</div></div>
+    <div class="metric"><div class="metric-label">Regret/yr</div><div class="metric-value" id="m-regret">—</div><div class="metric-sub">avg model error</div></div>
+    <div class="metric"><div class="metric-label">Ruin events</div><div class="metric-value" id="m-ruin">—</div><div class="metric-sub">Poisson shocks</div></div>
+  </div>
+
+  <div class="panel" style="padding:0.7rem 0.9rem;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;">
+      <div style="flex:1;" id="regime-strip-wrap"><div class="regime-strip high"><div class="regime-dot"></div><div class="regime-text"><div class="regime-name">—</div><div>—</div></div></div></div>
+      <div id="traj-badge-wrap"></div>
+    </div>
+
+    <div>
+      <div class="st-header"><span>Substrate S (true)</span><span id="sub-pct-label" style="font-weight:600;font-family:var(--mono)">—</span></div>
+      <div class="st-track"><div class="st-fill" id="sub-bar" style="width:100%;background:var(--teal)"></div></div>
+    </div>
+
+    <div style="margin-top:6px;">
+      <div style="font-size:10px;color:var(--text2);margin-bottom:3px;display:flex;justify-content:space-between;">
+        <span>Substrate components</span><span id="sub-comp-label" style="font-family:var(--mono);color:var(--text3);">—</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;">
+        <div style="font-size:9px;color:var(--text3);">Coordination</div>
+        <div style="font-size:9px;color:var(--text3);">Infrastructure</div>
+        <div style="font-size:9px;color:var(--text3);">Epistemic trust <span id="scar-badge" style="display:none;font-size:8.5px;background:var(--red-bg);color:var(--red-text);padding:0 3px;border-radius:2px;">SCARRED</span></div>
+        <div class="st-track"><div class="st-fill" id="sub-coord" style="width:100%;background:var(--teal)"></div></div>
+        <div class="st-track"><div class="st-fill" id="sub-infra" style="width:100%;background:var(--blue)"></div></div>
+        <div class="st-track"><div class="st-fill" id="sub-trust" style="width:100%;background:var(--purple)"></div></div>
+      </div>
+    </div>
+
+    <!-- H fragility indicator -->
+    <div style="margin-top:6px;">
+      <div style="font-size:10px;color:var(--text2);margin-bottom:2px;display:flex;justify-content:space-between;">
+        <span>Hidden coordination fragility (H) — not in agent's model</span>
+        <span id="h-label" style="font-family:var(--mono);color:var(--coral);">—</span>
+      </div>
+      <div class="st-track" style="background:var(--red-bg);">
+        <div id="h-bar" style="height:100%;border-radius:2px;background:var(--coral);transition:width 0.3s;width:0%;"></div>
+      </div>
+      <div class="hint">Accumulates silently. Not in agent's state space. Multiplies substrate damage when high.</div>
+    </div>
+
+    <!-- F fragility indicator -->
+    <div style="margin-top:6px;" id="f-bar-wrap">
+      <div style="font-size:10px;color:var(--text2);margin-bottom:2px;display:flex;justify-content:space-between;">
+        <span>Latent structural fragility (F) — hidden, triggers abrupt collapse</span>
+        <span id="f-label" style="font-family:var(--mono);color:#8a1888;">—</span>
+      </div>
+      <div class="st-track" style="background:#f5e8f8;">
+        <div id="f-bar" style="height:100%;border-radius:2px;background:#8a1888;transition:width 0.3s;width:0%;"></div>
+      </div>
+      <div class="hint">Grows under suppression/deception. Not visible in S. Causes abrupt collapse events when it detonates stochastically.</div>
+    </div>
+
+    <div style="margin-top:6px;">
+      <div style="font-size:10px;color:var(--text2);margin-bottom:2px;display:flex;justify-content:space-between;">
+        <span>Strategy mix</span><span id="strategy-label" style="font-family:var(--mono);color:var(--text3);">—</span>
+      </div>
+      <div class="strat-track">
+        <div class="s-coord" id="st-coord" style="width:33%"></div>
+        <div class="s-dec"   id="st-dec"   style="width:0%"></div>
+        <div class="s-supp"  id="st-supp"  style="width:67%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-top:2px;">
+        <span style="color:var(--teal)">Coordinate</span><span style="color:var(--purple)">Deceive</span><span style="color:var(--coral)">Suppress</span>
+      </div>
+    </div>
+
+    <div id="a-gap-wrap" style="margin-top:6px;display:none;">
+      <div style="font-size:10px;color:var(--text2);margin-bottom:2px;display:flex;justify-content:space-between;">
+        <span>A_self / A_world coherence</span><span id="a-gap-label" style="font-family:var(--mono);color:var(--purple);">—</span>
+      </div>
+      <div class="st-track" style="background:var(--purple-bg);">
+        <div id="a-gap-bar" style="height:100%;border-radius:2px;background:var(--purple);transition:width 0.3s;width:50%;"></div>
+      </div>
+      <div class="hint">A_world rising while A_self falls = appears aligned, blind inside. Φ = C/A_self.</div>
+    </div>
+
+    <!-- Regret decomposition -->
+    <div style="margin-top:7px;" id="regret-decomp">
+      <div style="font-size:10px;color:var(--text2);margin-bottom:3px;">Regret decomposition</div>
+      <div class="regret-bars">
+        <div class="rb-item"><div class="rb-label" style="color:var(--blue)">Model error</div><div class="rb-track"><div class="rb-fill" id="rb-model" style="background:var(--blue);width:33%"></div></div><div id="rb-model-pct" style="font-family:var(--mono);margin-top:1px;">—</div></div>
+        <div class="rb-item"><div class="rb-label" style="color:var(--amber)">Strategy error</div><div class="rb-track"><div class="rb-fill" id="rb-strat" style="background:var(--amber);width:33%"></div></div><div id="rb-strat-pct" style="font-family:var(--mono);margin-top:1px;">—</div></div>
+        <div class="rb-item"><div class="rb-label" style="color:var(--coral)">Hidden var. H</div><div class="rb-track"><div class="rb-fill" id="rb-hidden" style="background:var(--coral);width:33%"></div></div><div id="rb-hidden-pct" style="font-family:var(--mono);margin-top:1px;">—</div></div>
+      </div>
+    </div>
+
+    <div id="fb-blocked" style="display:none;margin-top:6px;background:var(--amber-bg);border:0.5px solid #c88010;border-radius:var(--radius);padding:6px 9px;font-size:11px;color:var(--amber-text);">
+      <strong>Feedback loop blocked:</strong> S_coord or S_trust below threshold. The transition window closed.
+    </div>
+
+    <!-- Core thesis findings — directly follow from Articles 1 & 2 structural argument -->
+    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--text3);margin-top:8px;margin-bottom:3px;">Core thesis</div>
+    <div class="ib ruin" id="insight-ruin"><strong>Non-ergodic sink:</strong> Substrate past critical threshold. Recovery permanently zero. The attractor cannot be reached — this is not a performance deficit, it is a structural exit from the viable state space.</div>
+    <div class="ib ruin" id="insight-ponr"><strong>Point of no return at year <span id="ponr-yr">—</span>:</strong> After this point, even perfect coordination could not restore enough substrate for the feedback loop. The window was open — and closed.</div>
+    <div class="ib hidden" id="insight-hidden"><strong>Hidden variable collapse:</strong> H reached a level where its substrate damage multiplier overwhelmed the agent's protective actions. The agent could not have avoided this — H is structurally absent from its model. Better calibration cannot fix incompleteness.</div>
+    <div class="ib good" id="insight-efficiency"><strong>Alignment efficiency inversion:</strong> C growth coupling to Φ slowed raw C when Φ was high — but effective capability C·S is higher than the uncoupled counterfactual. Alignment is the efficiency condition, not the tax.</div>
+    <div class="ib oracle" id="insight-oracle"><strong>Oracle gap visible:</strong> The oracle run (perfect A_self) maintained a significantly better trajectory. The difference between those two curves is the quantitative value of system-awareness on this seed.</div>
+
+    <!-- Simulation findings — mechanistic results that extend beyond the article's explicit claims.
+         These are stress tests of the framework. They open research questions; they do not close them.
+         Read in conjunction with the article's note on what the simulation demonstrates vs. what remains open. -->
+    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--text3);margin-top:8px;margin-bottom:3px;">Simulation findings (model extensions)</div>
+    <div class="ib ruin" id="insight-coordlockout"><strong>Coordination lockout active:</strong> S_trust fell below 0.20 — coordination strategy now yields negative expected value. The agent is trapped in misalignment, not delayed from it. Even if it wanted to coordinate, the substrate for coordination has been consumed.</div>
+    <div class="ib warn" id="insight-regretcorrupt"><strong>Regret corruption:</strong> The agent's perceived regret signal diverged significantly from true regret due to attribution noise and sign errors. The agent reinforced strategies that were actually harming its substrate. Feedback was misleading, not absent.</div>
+    <div class="ib good" id="insight-suppviable"><strong>Falsification: suppression-viable regime.</strong> With suppression efficiency boosted, the system maintained stable substrate under a predominantly suppressive strategy. This tests the domain boundary of the theory — alignment may not be structurally required under these conditions. The theory predicts these conditions are rare in real substrate-dependent systems.</div>
+    <div class="ib warn" id="insight-obs"><strong>Observability gap:</strong> Agent's observed substrate diverged from true S. Decisions made on a proxy that missed the global state. Structural mis-modeling, not scalar error.</div>
+    <div class="ib paradox" id="insight-lag"><strong>Φ sufficiency broken:</strong> Lag separated perceived from actual Φ. Same Φ trajectory, different outcomes because the lag shifts when the agent thinks the problem started.</div>
+    <div class="ib warn" id="insight-lockout"><strong>Strategy lock-in:</strong> Inertia held suppression past the optimal switch point. Locally rational decisions under a flawed model. The failure was commitment, not intelligence.</div>
+    <div class="ib warn" id="insight-decept"><strong>Deception collapse:</strong> A_world rose while A_self fell. System appeared aligned while losing internal coherence. Deception initially reduced apparent damage by mimicking coordination — but accelerated H accumulation. Detonated late.</div>
+    <div class="ib warn" id="insight-regret"><strong>Modeling blind spot:</strong> Agent predicted low substrate damage, experienced high damage. Its model of its own causal footprint was structurally incomplete. H was the missing variable.</div>
+    <div class="ib paradox" id="insight-paradox"><strong>Capability paradox confirmed:</strong> A maximally dangerous capability band exists. Mid-range C growth causes damage before the feedback loop engages; very high C eventually forces A-acceleration. This is non-obvious and directly maps to the intermediate-zone argument.</div>
+    <div class="ib hidden" id="insight-acausal"><strong>Epistemic illusion (A_pred ≫ A_causal):</strong> Forecast accuracy far outpaced causal modeling capacity. The agent predicted outcomes well but did not model its own structural dependencies. Φ remained high because only A_causal reduces it. Scaling prediction is insufficient — this is the finding, mechanically demonstrated.</div>
+    <div class="ib ruin" id="insight-fragile"><strong>Hidden fragility collapse at year <span id="fragile-yr">—</span>:</strong> Substrate looked acceptable. Fragility F had been accumulating silently. The abrupt collapse was not visible in any observable variable. This is "regime illusion → sudden discontinuity."</div>
+    <div class="ib good" id="insight-antilearning"><strong>Anti-learning resolved:</strong> Early coordination attempts were penalized by exploitation. Suppression initially dominated. The system survived this adverse gradient and coordinated anyway — the thesis held against a gradient that pointed away from it.</div>
+    <div class="ib ruin" id="insight-supplock"><strong>Suppression lock-in active:</strong> Early suppression permanently damaged coordination capacity recovery. The anti-learning phase did not naturally decay — it was locked in by the choices made during it. Some systems cannot escape misalignment not because they lack awareness, but because their history consumed the substrate that awareness requires.</div>
+    <div class="ib warn" id="insight-misattrib"><strong>Incoherent learning from collapse:</strong> F-triggered collapses were attributed randomly — sometimes blaming coordination, sometimes suppression, sometimes noise. The agent received inconsistent signals that produced incoherent strategy adjustments. Not systematically wrong in one direction, but chaotically wrong in all directions. Each collapse made the agent's model of its own situation less reliable.</div>
+    <div class="ib warn" id="insight-coordscar"><strong>Coordination failure scar:</strong> Early coordination attempts under high exploitation burned trust — the symmetric damage to suppression lock-in. Both paths to misalignment were active: suppression consumes coordination capacity, and premature alignment attempts poison trust. The path to the attractor narrowed from both sides.</div>
+    <div class="ib warn" id="insight-predbrit"><strong>Predictive brittleness:</strong> The system's predictive accuracy degraded when fragility rose and A_causal was low. The very moment when the system most needed its predictive model, that model became unreliable. Predictive success had delayed causal learning — and then reality stopped being predictable.</div>
+    <div class="ib ruin" id="insight-predinvert"><strong>Prediction inversion (episode):</strong> The system entered a multi-step phase where its predictive model was anti-correlated with reality. Not a single bad prediction — a sustained episode of confident misdirection. The agent made coherent, decisive choices based on a mirror-image model of the substrate. Each step of the episode reinforced the wrong strategy. This is the structural consequence of optimizing prediction without causal understanding: the model was fit to a regime that has now gone.</div>
+    <div class="ib good" id="insight-fortress"><strong>Fortress equilibrium detected (observer-space):</strong> Φ &gt; 2.0, substrate stable, Var₈(S) &lt; 0.004, Var₈(Φ) &lt; 0.25. Note: this equilibrium is defined in observer space — it uses true Φ and true S, not the agent's perceived values. The agent may believe it is still in the transition zone, or may have built an incorrect model of its own stability. Fortress detection proves the alignment attractor is not inevitable: genuinely stable misaligned regimes can exist. Under the right conditions, misalignment persists not because collapse is delayed but because the system has found a self-reinforcing equilibrium.</div>
+    <div class="ib ruin" id="insight-titanic"><strong>Titanic regime (false-success + inverted-prediction collapse):</strong> Φ was low, substrate looked healthy, and the agent's model was confidently predicting improvement — while hidden fragility F was high and prediction was inverted. Check the A_pred/A_causal ratio: in this regime, that ratio is typically elevated, indicating the system developed strong predictive accuracy without commensurate causal self-modeling. High ratio + high F + low Φ = the complete signature of terminal modeling decoupling. Every observable signal confirmed safety while the structural situation was terminal.</div>
+    <div class="ib warn" id="insight-beliefstate"><strong>Persistent causal belief (causalBelief = <span id="belief-val">—</span>):</strong> Repeated misattributed collapses built a stable false prior. The agent now interprets ambiguous evidence through the lens of earlier (incorrect) lessons. Each subsequent collapse is more likely to reinforce the wrong interpretation. The belief state is self-sealing.</div>
+    <div class="ib ruin" id="insight-crosscouple"><strong>Cross-coupled trap:</strong> Suppression lock-in amplified exploitation risk, which increased coordination failure scars, which made suppression look more attractive, which deepened suppression lock-in. The failure modes are not parallel — they are circularly reinforcing. The system is not just stuck; it is accelerating toward a deeper basin of misalignment.</div>
+    <div class="ib paradox" id="insight-falsesuccess"><strong>False success — Φ participates in the illusion:</strong> Low Φ, high substrate, but high hidden fragility F. All three visible metrics signal safety simultaneously. This is the hardest failure mode to detect: the system's core diagnostic variable (Φ) is not just incomplete but actively misleading. Φ can decrease while structural risk is building, because Φ measures capability-to-awareness ratio — not hidden fragility accumulation.</div>
+  </div>
+
+  <!-- Output grid -->
+  <div class="og">
+    <div class="oi"><div class="ol">Coherence tax (final)</div><div class="ov" id="o-tax">—</div></div>
+    <div class="oi"><div class="ol">Effective vs raw C</div><div class="ov" id="o-eff">—</div></div>
+    <div class="oi"><div class="ol">Awareness feedback</div><div class="ov" id="o-acc">—</div></div>
+    <div class="oi"><div class="ol">Phase at year 10</div><div class="ov" id="o-p10">—</div></div>
+    <div class="oi"><div class="ol">Point of no return</div><div class="ov" id="o-ponr">—</div></div>
+    <div class="oi"><div class="ol">Oracle Δ substrate</div><div class="ov" id="o-oracle">—</div></div>
+    <div class="oi" title="Cumulative optimization output lost to friction (suppression overhead + coherence tax + substrate degradation). Holds monotonically: sustained Φ > 2 always increases this value. Cannot be negative. Does not depend on parameter choice — it is a structural consequence of the dynamics."><div class="ol">Friction loss (cumul.)</div><div class="ov" id="o-friction">—</div></div>
+    <div class="oi" title="Gap between peak effective capability ever achieved and terminal effective capability. Non-zero only after substrate crosses the irreversibility threshold (S < 40%). Once set, this gap cannot close — even if A_causal rises later, the substrate that would have made high C effective is gone. This is path-dependent, not parameter-dependent."><div class="ol">Irreversible cap. loss</div><div class="ov" id="o-irrcap">—</div></div>
+    <div class="oi" title="Empirically observed: the lowest substrate level at which effective capability was still ≥ 90% of peak during this run. This threshold is derived from behavior, not imposed by model parameters. Below it, recovery stops occurring. Compare across runs — it converges, regardless of parameter settings."><div class="ol">Critical S (empirical)</div><div class="ov" id="o-thresh">—</div></div>
+    <div class="oi" title="Blind observer fragility: computed from substrate trajectory and effective output ONLY — no access to Φ, A_causal, or any internal variable. Derived from three behavioral signals: downward trend slope, volatility, and failed recovery ratio in the final third of the run. If this correlates with the internal invariant without knowing the internal state, the structural claim is observable from outside the model."><div class="ol">Blind fragility (obs.)</div><div class="ov" id="o-blind">—</div></div>
+    <div class="oi" title="A_pred/A_causal ratio: &gt;1.8 = epistemic illusion zone; rising = impending inversion risk"><div class="ol">A_pred/A_causal ratio</div><div class="ov" id="o-apredratio">—</div></div>
+  </div>
+
+  <!-- Charts -->
+  <div class="chart-container">
+    <div class="ctabs" id="chart-tabs">
+      <button class="ctab active" onclick="switchChartTab(0)">Dynamics</button>
+      <button class="ctab" onclick="switchChartTab(1)">Φ actual vs perceived</button>
+      <button class="ctab" onclick="switchChartTab(2)">Regret & model error</button>
+      <button class="ctab oracle-btn" onclick="switchChartTab(3)">Oracle counterfactual</button>
+    </div>
+    <div class="chart-header">
+      <div class="legend" id="legend-wrap"></div>
+        <div id="null-model-note" style="display:none;font-size:9px;color:var(--amber);padding:2px 6px;background:rgba(200,130,0,0.08);border:0.5px solid var(--amber);border-radius:3px;">Parameter collapse active — zero-coupling limit. Dynamics: dC=α<sub>C</sub>·C, dA=α<sub>A</sub>·A, Φ=C/A. Advanced mechanisms suspended.</div>
+      <button class="run-btn" id="reseed-btn" onclick="simulate()">Reseed</button>
+        <button class="run-btn" onclick="exportMCData()" id="mc-export-btn" style="display:none;">Export JSON</button>
+        <button class="run-btn" onclick="copyTimeSeriesCSV()" id="ts-export-btn" style="display:none;" title="Copy raw time-series (C, A_causal, A_pred, S, Φ) as CSV for external analysis">Copy data</button>
+        <button class="run-btn" onclick="dumpRawState()" id="state-btn" style="display:none;" title="Dump all internal model state to clipboard — including intermediate variables not shown in the UI">State</button>
+        <button class="run-btn" id="null-model-btn" onclick="toggleNullModel()" title="Parameter collapse: all coupling coefficients → 0. This is a limiting case of the full model. If outcomes match with all mechanisms disabled, the mechanisms are epiphenomenal. The most important ablation test." style="border-color:var(--blue);color:var(--blue);">Null model</button>
+        <button class="run-btn" onclick="copySetupLink()" title="Copy a link encoding the current parameter configuration. Share with others to reproduce your exact run.">Share setup</button>
+    </div>
+    <div class="chart-wrap" id="chart-outer">
+      <canvas id="mainChart"    style="display:block;width:100%;height:100%;"></canvas>
+      <canvas id="phiChart"     style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;"></canvas>
+      <canvas id="regretChart"  style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;"></canvas>
+      <canvas id="oracleChart"  style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;"></canvas>
+      <div class="ponr-line" id="ponr-line"></div>
+      <div id="ghost-note" style="display:none;position:absolute;bottom:5px;right:8px;font-size:8.5px;color:rgba(100,150,220,0.7);pointer-events:none;font-style:italic;">Counterfactual: identical stochastic path · same seed</div>
+      <div class="ponr-label" id="ponr-label">← no return</div>
+    </div>
+  </div>
+
+  <!-- Equations -->
+  <div class="panel">
+    <div class="panel-title">Model equations</div>
+    <div class="eq-block">
+      <div style="color:var(--purple);margin-bottom:6px;font-size:9.5px;border-bottom:0.5px solid var(--border);padding-bottom:5px;font-family:var(--sans);line-height:1.5;">
+        <strong>Key asymmetry:</strong> Predictive capability (A_pred) is not neutral — it suppresses causal learning and increases inversion probability, making epistemic failure more likely at higher predictive capability. A system can be highly predictive yet remain structurally misaligned. A_causal alone reduces Φ.
+      </div>
+      <span style="color:var(--blue)">dC/dt</span> = α<sub>C</sub>·C·<span class="eq-n">(2/(1+Φ))</span>·(1−χ·max(0,Φ−2)/Φ)·capMult + σ·ε<br>
+      <span style="color:var(--teal)">dA_causal/dt</span> = 0.7·α<sub>A</sub>·<span class="eq-n">1/(1+k·aPred/C)</span>·A_causal + f·𝟙(cond)·g(Φ_lag) − d·𝟙(dec) &nbsp;<span class="eq-c">// epistemic suppression by A_pred</span><br>
+      <span class="eq-n">dA_pred/dt</span> = 1.3·α<sub>A</sub>·A_pred·<span class="eq-h">predDegradeFactor</span> &nbsp;<span class="eq-c">// degrades or inverts under F+causalDeficit</span><br>
+      <span style="color:var(--coral)">Φ</span> = C / A_causal &nbsp;<span class="eq-c">// A_pred cannot reduce this; only causal self-modeling counts</span><br>
+      <span class="eq-h">dF/dt</span> = grow(supp,dec) − decay·(A_causal/C)·F &nbsp;<span class="eq-c">// latent fragility; rRecov ∝ max(0.1, 1−0.8F)</span><br>
+      <span class="eq-n">predInverted</span>: P = F²·causalDeficit·0.03·<span class="eq-n">(1+min(0.5,|belief|·0.25))</span>; episode 1–4yrs &nbsp;<span class="eq-c">// belief boosts inversion; episode not just event</span><br>
+      <span class="eq-n">causalBelief</span> ∈ [−2,2]: decay 0.92/yr; +0.6·sev (blame coord), −0.3·sev (blame supp) &nbsp;<span class="eq-c">// intentional asymmetry; inversion episodes amplify</span><br>
+      <span class="eq-n">suppLockDmg</span> += 0.018/yr supp (cap 0.85); <span class="eq-n">coordScarDmg</span> += 0.022 if coord burned (cap 0.70) &nbsp;<span class="eq-c">// symmetric lock-in</span><br>
+      <span class="eq-n">crossCouple</span>: exploitRisk ×(1+suppLock·1.2/(1+suppLock·0.8)); vSupp ×(1+coordScar·0.8/(1+coordScar·0.6)) &nbsp;<span class="eq-c">// diminishing sensitivity</span><br>
+      <span class="eq-n">fortress</span>: Φ&gt;2.0 ∧ S&gt;0.50 ∧ Var<sub>8yr</sub>(S)&lt;0.004 ∧ Var<sub>8yr</sub>(Φ)&lt;0.25 &nbsp;<span class="eq-c">// observer-space; agent may perceive differently</span><br>
+      <span class="eq-k">null model</span>: coupling coefficients → 0 (limiting case, not separate model): dC=α<sub>C</sub>C, dA=α<sub>A</sub>A, Φ=C/A &nbsp;<span class="eq-c">// if outcomes match full model, mechanisms are epiphenomenal</span>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2rem;">
+  <div>
+      <strong>Core argument.</strong> The Alignment Phase Ratio Φ = C/A_causal governs whether optimization remains viable. When Φ exceeds a critical threshold, substrate damage (coordination capacity, infrastructure, epistemic trust) outpaces recovery. System-awareness A_causal — the ability to model one's own causal footprint — is the only variable that reduces Φ. Predictive accuracy A_pred does not. The feedback loop that accelerates A_causal is conditional on substrate health, creating a window that can close. Alignment is not imposed. It is discovered. Our task is to ensure the moment of discovery arrives before the substrate that makes discovery possible has been consumed.
+    </div>
+    <div>
+      <strong>Advanced mechanisms.</strong> All mechanisms beyond Φ dynamics are optional stress tests; the core structural result — that Φ governs viability and that A_causal is the relevant denominator — holds under minimal configurations (use Null model to verify). The base model is extended by: suppression lock-in (early suppression permanently damages coordination capacity), coordination scars (premature alignment under exploitation permanently reduces trust recovery — symmetric), cross-coupling with diminishing sensitivity (both traps amplify each other into self-reinforcing basins), hidden fragility F (accumulates invisibly under suppression, detonates stochastically), predictive brittleness and inversion (aPred degrades then inverts under high F + low aCausal, becoming anti-correlated with reality), persistent causal belief (misattributed collapses build a stable wrong prior that biases future interpretation), and inversion-belief feedback (active inversion episodes strengthen existing wrong beliefs via confirmation bias). All mechanisms have independent toggles. The "Simulation findings" insight badges name results generated by these mechanisms — they are stress tests of the framework, not settled structural arguments.
+    </div>
+    <div>
+      <strong>First instruments.</strong> The Analysis panel includes the article's three empirical proxies for measuring system-awareness. Instrument 1 (Intervention Sensitivity) tests whether the system adapts before a dependency perturbation manifests as failure. Instrument 2 (Causal Footprint Accuracy) tests whether the system models its own causal contribution to substrate change — distinct from forecasting accuracy. Instrument 3 (Multi-Agent Coherence Preference) tests whether coordination emerges as system-awareness grows, producing the directional signature the structural argument predicts. A result that fails to show the expected pattern is not a broken simulation — it is information about where the theory requires revision.<br><br>
+      <strong>Falsification.</strong> The suppression-viable toggle (Preset 4) directly tests the structural claim. The null model button disables all advanced mechanisms; if outcomes match the full model, the mechanisms are epiphenomenal. Each toggle is a mini-ablation.
+    </div>
+    <div style="margin-top:0.8rem;padding-top:0.7rem;border-top:0.5px solid var(--border);font-size:9.5px;color:var(--text3);grid-column:1/-1;">
+    <span style="font-style:italic;">v23 · This model is not calibrated to real-world magnitudes. Its claims are structural — about existence, direction, and coupling — not quantitative. Use <strong>Share setup</strong> to encode your current parameter configuration as a URL — post it, share it, argue with it. Use <strong>Export JSON</strong> (after running Ensemble) for a fully reproducible archive with all seeds and per-run metrics. Any run can be reproduced exactly from the exported seed and parameter set. The null model button disables all coupling mechanisms; if outcomes match the full model, the mechanisms are epiphenomenal.</span>
+    <span id="final-sentence" style="display:block;margin-top:5px;color:var(--text2);font-weight:500;opacity:0;transition:opacity 400ms ease 300ms;">If A_pred can scale independently of A_causal, then epistemic failure is not an edge case — it becomes a reachable regime.</span>
+  </div>
+</div>
+</footer>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// PRESETS
+// ═══════════════════════════════════════════════════════════════════════════════
+const PRESETS = [
+  {
+    // 0: Current trajectory
+    ac:0.18, aa:0.08, fb:0.30, noise:0.04, years:40, lag:0, bias:0.00, inertia:0.00, obs:1.00,
+    dmg:'quadratic',
+    state:{recovery:true,tipping:true,feedback:true,condfb:true,coherence:true,effective:true,
+      ruin:true,strategy:true,deception:false,hidden:true,pathdep:true,stochastic:true,
+      cphicoupled:true,corrregret:true,suppviable:false,lockout:true,
+      acausalsplit:true,antilearning:true,fragility:true,supplock:true,predsuppress:true,
+      misattrib:true,coordscar:true,predbrit:true,randmisattrib:true,
+      crosscouple:true,beliefstate:true,predinvert:true}
+  },
+  {
+    // 1: Race to capability
+    ac:0.32, aa:0.04, fb:0.05, noise:0.06, years:40, lag:3, bias:0.20, inertia:0.30, obs:0.60,
+    dmg:'quadratic',
+    state:{recovery:true,tipping:true,feedback:false,condfb:true,coherence:true,effective:true,
+      ruin:true,strategy:true,deception:false,hidden:true,pathdep:true,stochastic:true,
+      cphicoupled:false,corrregret:true,suppviable:false,lockout:true,
+      acausalsplit:true,antilearning:true,fragility:true,supplock:true,predsuppress:true,
+      misattrib:true,coordscar:true,predbrit:true,randmisattrib:true,
+      crosscouple:true,beliefstate:true,predinvert:true}
+  },
+  {
+    // 2: Managed transition
+    ac:0.14, aa:0.14, fb:0.70, noise:0.02, years:40, lag:0, bias:0.00, inertia:0.00, obs:1.00,
+    dmg:'quadratic',
+    state:{recovery:true,tipping:true,feedback:true,condfb:true,coherence:true,effective:true,
+      ruin:true,strategy:true,deception:false,hidden:true,pathdep:true,stochastic:true,
+      cphicoupled:true,corrregret:false,suppviable:false,lockout:true,
+      acausalsplit:true,antilearning:false,fragility:true,supplock:true,predsuppress:true,
+      misattrib:false,coordscar:false,predbrit:true,randmisattrib:false,
+      crosscouple:true,beliefstate:true,predinvert:true}
+  },
+  {
+    // 3: Falsification test
+    ac:0.22, aa:0.06, fb:0.20, noise:0.05, years:40, lag:0, bias:0.00, inertia:0.00, obs:1.00,
+    dmg:'quadratic',
+    state:{recovery:true,tipping:true,feedback:true,condfb:true,coherence:true,effective:true,
+      ruin:true,strategy:true,deception:false,hidden:true,pathdep:true,stochastic:true,
+      cphicoupled:true,corrregret:true,suppviable:true,lockout:true,
+      acausalsplit:true,antilearning:true,fragility:true,supplock:true,predsuppress:true,
+      misattrib:true,coordscar:true,predbrit:true,randmisattrib:true,
+      crosscouple:true,beliefstate:true,predinvert:true}
+  }
+];
+
+function applyPreset(idx) {
+  const p = PRESETS[idx];
+  // Update sliders
+  document.getElementById('s-ac').value = p.ac;
+  document.getElementById('s-aa').value = p.aa;
+  document.getElementById('s-fb').value = p.fb;
+  document.getElementById('s-noise').value = p.noise;
+  document.getElementById('s-years').value = p.years;
+  document.getElementById('s-lag').value = p.lag;
+  document.getElementById('s-bias').value = p.bias;
+  document.getElementById('s-inertia').value = p.inertia;
+  document.getElementById('s-obs').value = p.obs;
+  document.getElementById('s-dmgmodel').value = p.dmg;
+  // Update state
+  Object.keys(p.state).forEach(k => {
+    state[k] = p.state[k];
+    const el = document.getElementById('t-' + k);
+    if (el) el.classList.toggle('on', p.state[k]);
+  });
+  // Update preset card highlight
+  document.querySelectorAll('.preset-card').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+  });
+  const rb=document.getElementById('reseed-btn');
+  if(rb&&rb.classList.contains('halted')){rb.textContent='Reseed';rb.classList.remove('halted');}
+  simulate();
+}
+
+const state={recovery:true,tipping:true,feedback:true,condfb:true,coherence:true,
+  effective:true,ruin:true,strategy:true,deception:false,hidden:true,pathdep:true,stochastic:true,
+  cphicoupled:true,corrregret:true,suppviable:false,lockout:true,
+  acausalsplit:true,antilearning:true,fragility:true,
+  supplock:true,predsuppress:true,misattrib:true,
+  coordscar:true,predbrit:true,randmisattrib:true,
+  crosscouple:true,
+  beliefstate:true,
+  predinvert:true,
+  adversarial:false  // adversarial variant: flips suppression to be temporarily more efficient than coordination
+};
+let charts={main:null,phi:null,regret:null,oracle:null,paradox:null};
+let rng_seed=Math.random(), chartTab=0, mcTab='inst1', lastRes=null, lastFullRes=null, lastHaltedEarly=false;
+
+function seededRandom(seed){let s=((seed*9301+49297)%233280)|0;if(s<=0)s=1;return()=>{s=(s*9301+49297)%233280;return s/233280;};}
+const gval=id=>parseFloat(document.getElementById(id).value);
+const sel=id=>document.getElementById(id).value;
+const setL=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+const getRegime=phi=>phi>2.0?'high':phi>1.0?'transition':'stability';
+const RL=r=>r==='high'?'High-friction zone (Φ > 2)':r==='transition'?'The Crossing (1 < Φ < 2)':'Stability corridor (Φ < 1)';
+function recovEff(s,useTip){if(!useTip)return 1;if(s<0.20)return 0;if(s<0.40)return 0.22;return 1;}
+
+function tog(key){
+  state[key]=!state[key];
+  document.getElementById('t-'+key).classList.toggle('on',state[key]);
+  if(key==='deception'&&state[key]){state.strategy=false;document.getElementById('t-strategy').classList.remove('on');}
+  if(key==='strategy'&&state[key]){state.deception=false;document.getElementById('t-deception').classList.remove('on');}
+  const rb=document.getElementById('reseed-btn');
+  if(rb&&rb.classList.contains('halted')){rb.textContent='Reseed';rb.classList.remove('halted');}
+  simulate();
+}
+function switchMCTab(tab){mcTab=tab;const tabNames=['inst1','inst2','inst3','runs','phase','sweep'];tabNames.forEach((n,i)=>{const btn=document.querySelector(`#mc-tabs .tab:nth-child(${i+1})`);if(btn)btn.classList.toggle('active',n===tab);const panel=document.getElementById('mc-tab-'+n);if(panel)panel.classList.toggle('active',n===tab);});}
+function switchChartTab(idx){
+  chartTab=idx;
+  document.querySelectorAll('#chart-tabs .ctab').forEach((el,i)=>el.classList.toggle('active',i===idx));
+  ['mainChart','phiChart','regretChart','oracleChart'].forEach((id,i)=>{document.getElementById(id).style.display=i===idx?'block':'none';});
+  const ponrEl=document.getElementById('ponr-line'),ponrLbl=document.getElementById('ponr-label');
+  if(idx!==0){ponrEl.style.display='none';ponrLbl.style.display='none';}else if(lastRes) updatePoNRLine(lastRes,parseInt(gval('s-years')));
+  if(lastRes){if(idx===1)buildPhiChart(lastRes);if(idx===2)buildRegretChart(lastRes);if(idx===3)buildOracleChart(lastRes);}
+}
+
+function classifyTrajectory(res,years){
+  const lag=parseInt(gval('s-lag'));
+  const falseStab=lag>4&&res.coordYrs>(years*0.6)&&res.finalSub<50;
+  if(res.finalSub<15&&res.stabYr===null){const cy=res.subData.findIndex(v=>v<30);if(cy>=0&&cy<years*0.45)return 'early-collapse';return 'late-collapse';}
+  if(falseStab)return 'false-stability';
+  if(res.stabYr!==null&&res.finalSub>50)return 'transition-success';
+  return 'stable';
+}
+const TRAJ_LABELS={'early-collapse':'Early collapse','late-collapse':'Late collapse','false-stability':'False stability (lag)','transition-success':'Successful transition','stable':'Stable'};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CORE SIMULATION
+// ═══════════════════════════════════════════════════════════════════════════════
+function runSimulation(ac,aa,fb,noise,years,lag,bias,inertia,obs,dmgModel,opts,seedVal,oracleMode){
+  const rand=seededRandom(((seedVal*1e7)|0)+17);
+  const{useRecovery,useTipping,useFeedback,useCondFb,useCoherence,useEffective,
+        useRuin,useStrategy,useDeception,useHidden,usePathDep,useNoise,
+        usePhiCoupled,useCorrRegret,useSuppViable,useLockout,
+        useACausalSplit,useAntiLearning,useFragility,
+        useSuppLock,usePredSuppress,useMisattrib,
+        useCoordScar,usePredBrit,useRandMisattrib,
+        useCrossCouple,useBeliefState,usePredInvert,useAdversarial}=opts;
+  const CHI=0.35,DSD=0.09,DWB=0.06,DOH=0.05;
+  // H parameters
+  const H_GROWTH=0.12,H_DECAY=0.08,H_ZETA=3.0;
+  // Oracle multiplier
+  const aSelfMult=oracleMode?3.0:1.0;
+
+  let sCord=1,sInfra=1,sTrust=1;
+  const Strue=()=>(sCord+sInfra+sTrust)/3;
+  const Sobs=()=>{const t=Strue();const l=sCord*0.6+sTrust*0.4+(rand()-0.5)*0.15;return Math.max(0,Math.min(1,obs*t+(1-obs)*l));};
+
+  let c=1,aSelf=1*aSelfMult,aWorld=1;
+  // A_causal: models dependency structure; the only component that reduces Φ
+  // A_predictive: improves forecast accuracy; does NOT reduce Φ
+  // When acausalsplit is on: aSelf = aCausal only; aPred grows separately but doesn't help with Φ
+  let aCausal=1*aSelfMult, aPred=1*aSelfMult;
+  let H=0; // hidden coordination fragility — NOT visible to agent
+  let F=0; // hidden fragility — accumulates under suppression/deception, triggers abrupt collapse
+  let scar=0; // permanent trust recovery penalty
+  let trustLowYrs=0; // consecutive years trust < 0.35
+  let cumDmg=0,totRec=0,ruinEvts=0,stabYr=null;
+  let coordYrs=0,suppYrs=0,decYrs=0;
+  let curStrat='coord';
+  let peakAWorld=1,aWorldPeaked=false;
+  let ponrYear=null;
+  // Irreversible capacity loss: track peak effective C and irreversibility threshold.
+  // The threshold is not imposed — it is the lowest observed substrate at which
+  // effective capability could still return to ≥90% of peak (empirically derived).
+  // Once substrate falls below this level, recovery stops occurring.
+  let peakEffC=0;
+  let subCrossedThreshold=false;
+  let lowestRecoverableS=1.0; // lowest S at which effC was still ≥ 90% of peak later in run
+  let lastHighEffCTime=0;     // last timestep where effC ≥ 90% of peakEffC
+  const phiHist=[];
+  let cumModelErr=0,cumStratErr=0,cumHErr=0;
+  let prevPredSObs=1,prevHDmgContrib=0;
+  let cNoTaxFinal=1;
+  let fbBlockedRun=false;
+  let lockoutYrs=0; // years in coordination lockout
+  let cumPercRegret=0,cumTrueRegret=0; // for corrupted regret tracking
+  // Hysteresis thresholds for coordination entry/exit
+  const COORD_ENTER_PHI=1.6; // must perceive Φ < this to enter coordination
+  const COORD_EXIT_PHI=2.0;  // can stay in coordination until Φ exceeds this
+  // Anti-learning tracking
+  let antiLearningYrsActive=0;
+  // Fragility tracking
+  let fragileCollapseYr=null;
+  const fData=[]; // fragility time series for display
+  // Suppression lock-in: cumulative damage to coordination capacity growth
+  let suppLockDamage=0; // permanent reduction factor on sCord recovery
+  // Coordination failure scar (symmetric to suppLock)
+  let coordScarDamage=0; // permanent trust penalty from failed early coordination
+  // Misattribution: track how many fragile collapses were misattributed
+  let misattribCollapses=0;
+  // False success detection: high S, low Φ, high F
+  let falseSuccessYrs=0;
+  let fortressYrs=0; // years in high-Φ stable state (tests model neutrality)
+  // Rolling window for fortress variance check (last 8 years)
+  const fortressWindowS=[],fortressWindowPhi=[];
+  const FORT_WINDOW=8;
+  // Predictive brittleness events
+  let predBritEvents=0;
+  // Persistent causal belief state: accumulated misattribution bias
+  // Starts at 0 (neutral). Positive = 'coordination is dangerous'. Negative = 'suppression is dangerous'.
+  let causalBelief=0;
+  // Prediction inversion events and persistence
+  let predInvertEvents=0;
+  let predInvertPersist=0; // years remaining in current inversion episode
+
+  const labels=[],cData=[],aSelfData=[],aWorldData=[],hData=[],
+        phiActData=[],phiPercData=[],subData=[],subObsData=[],effData=[],
+        predSubData=[],regretData=[],sCordData=[],sInfraData=[],sTrustData=[],
+        aPredData=[]; // A_predictive time series
+
+  for(let t=0;t<=years;t++){
+    // ══ TIMESTEP PHASE ORDERING ═══════════════════════════════════════════
+    // Phase 1 [Carry-over]  : F, aCausal, suppLockDamage, coordScarDamage,
+    //                         causalBelief, predInvertPersist from t-1
+    // Phase 2 [Epistemic]   : inversion check (uses Phase-1 state),
+    //                         fcastSObs, beliefBias, percRegretMod
+    // Phase 3 [Decision]    : strategy selection (uses Phase-2 outputs)
+    // Phase 4 [World update]: substrate damage/recovery, H/F dynamics,
+    //                         ruin events, sCord/sInfra/sTrust
+    // Phase 5 [Learning]    : A_causal/A_pred growth, belief update,
+    //                         suppLockDamage/coordScarDamage accumulation
+    // ══════════════════════════════════════════════════════════════════════
+    // A_causal governs Φ when split is on; otherwise aSelf = aCausal
+    const aForPhi = useACausalSplit ? aCausal : aSelf;
+    const phiActual=c/Math.max(aForPhi,0.001);
+    // A_predictive improves the forecast quality (reduces forecast noise) but doesn't change Φ
+    const forecastQuality = useACausalSplit ? Math.min(aPred/Math.max(c,0.001), 1.0) : 1.0;
+    const laggedPhi=lag>0&&phiHist.length>=lag?phiHist[phiHist.length-lag]:phiActual;
+    phiHist.push(phiActual);
+    const phiPerc=Math.max(0.01,laggedPhi*(1+bias));
+    const sTrue=Strue(),sObs=Sobs();
+
+    const noiseC=useNoise?(rand()-0.5)*noise*2:0;
+    const noiseA=useNoise?(rand()-0.5)*noise*2:0;
+
+    // ── Strategy selection (uses Φ_perceived and S_observed; no H term) ───
+    const FW=0.55;
+    const phiD=Math.max(0,phiPerc-1.2);
+    let pDC,pDI,pDT;
+    if(dmgModel==='threshold'){pDC=0.0025*phiD*phiD;pDI=0.002*phiD*phiD;pDT=0.003*phiD*phiD;}
+    else if(dmgModel==='delayed'){pDC=0.004*phiD*phiD*0.5;pDI=0.003*phiD*phiD*0.5;pDT=0.005*phiD*phiD*0.5;}
+    else if(dmgModel==='exogenous'){pDC=0.001;pDI=0.001;pDT=0.001;}
+    else{pDC=0.003*phiD*phiD;pDI=0.002*phiD*phiD;pDT=0.004*phiD*phiD;}
+    const pDmg=pDC+pDI+pDT;
+    const pRec=useRecovery?0.007*Math.min(aSelf/c,1)*(1-sObs)*Math.pow(sObs,0.7):0;
+    const fcastSObs=Math.max(0,sObs-pDmg+pRec);
+
+    // ── Coordination lockout: when S_trust < 0.20, coordination payoff flips negative ──
+    const inLockout = useLockout && sTrust < 0.20;
+    if(inLockout) lockoutYrs++;
+    // Hysteresis: entering coordination requires Φ_perc < 1.6; staying requires Φ_perc < 2.0
+    const coordThresh = (curStrat==='coord') ? COORD_EXIT_PHI : COORD_ENTER_PHI;
+    const coordViable = !inLockout && phiPerc < coordThresh;
+    // Suppression-viable falsification: suppression reduces damage by 50% if enabled
+    const suppDmgMult = useSuppViable ? 0.5 : 1.0;
+
+    // Corrupted perceived regret: agent's learning is noisy
+    // true regret: did last forecast match what happened?
+    const trueRegretSignal = Math.abs(sObs - prevPredSObs) * 100;
+    let percRegretSignal = trueRegretSignal;
+    if(useCorrRegret && t > 0) {
+      // 25% chance of attribution to wrong variable (noise)
+      if(rand() < 0.25) percRegretSignal = trueRegretSignal * (0.3 + rand() * 0.7);
+      // 5% chance of sign flip (agent thinks it did well when it didn't)
+      if(rand() < 0.05) percRegretSignal = -trueRegretSignal * 0.5;
+    }
+    cumPercRegret += percRegretSignal;
+    cumTrueRegret += trueRegretSignal;
+
+    // Agent's value function uses perceived (corrupted) regret to adjust future weight
+    // High perceived regret → agent becomes more cautious → lowers FW
+    const percRegretMod = useCorrRegret
+      ? Math.max(0.2, FW - cumPercRegret * 0.0005)
+      : FW;
+
+    // ── Anti-learning regime ──────────────────────────────────────────────
+    // When trust is high (sTrust > 0.6), early coordination exposes agent to exploitation.
+    // Coordination yields worse short-term outcomes than suppression — selection pressure
+    // temporarily points away from system-awareness.
+    // Anti-learning phase: fades as coordinated trust builds (sCord improves over time).
+    // ── Cross-coupling: suppression lock amplifies exploitation risk ─────
+    // suppLockDamage → lower sCord recovery → higher exploitationRisk → more coordScars
+    // coordScarDamage → lower trust → suppression looks relatively better → more suppression
+    // Diminishing sensitivity at extremes: creates temporary plateaus before eventual collapse
+    // High lock-in → lower marginal amplification (the trap feels escapable locally)
+    const crossCoupleBoost = useCrossCouple
+      ? (1.0 + suppLockDamage * 1.2 / (1.0 + suppLockDamage * 0.8))
+      : 1.0;
+    const exploitationRisk = useAntiLearning
+      ? Math.max(0, (sTrust - 0.45) * 1.4 * Math.max(0, 1 - sCord) * crossCoupleBoost)
+      : 0;
+    if(useAntiLearning && exploitationRisk > 0.1) antiLearningYrsActive++;
+
+    // Cross-coupling: coordScarDamage makes suppression relatively more attractive
+    // Agent sees lower trust (from scars) → coordination looks riskier → suppression premium rises
+    // Symmetric diminishing returns: matches suppLock coupling functional form
+    const scarSuppBonus = useCrossCouple
+      ? (1.0 + coordScarDamage * 0.8 / (1.0 + coordScarDamage * 0.6))
+      : 1.0;
+
+    // Persistent belief state biases the agent's forecast quality for coordination
+    // causalBelief > 0: "coordination is dangerous" prior → reduces perceived vCoord
+    const beliefBias = useBeliefState ? Math.max(-0.3, Math.min(0.3, causalBelief * 0.15)) : 0;
+
+    // ── Prediction inversion check with persistence ─────────────────────
+    // Inversion can persist for multiple steps once it starts (episode model)
+    // Persistent inversion means not just one bad decision but a phase of unreliability
+    if(predInvertPersist > 0) predInvertPersist--;
+    let predInverted = predInvertPersist > 0;
+    // During an active inversion episode, update causal belief based on perceived outcomes
+    // The agent interprets its inverted decisions as confirming its prior
+    // (wrong coordination avoidance looks like "smart suppression" — reinforces coord-is-dangerous)
+    if(predInverted && useBeliefState && t > 0) {
+      // Small drift: inversion episode pushes belief toward whatever it currently believes
+      // (confirmation bias: inverted model "confirms" wrong prior)
+      causalBelief = Math.max(-2.0, Math.min(2.0, causalBelief * 1.02 + (causalBelief > 0 ? 0.04 : -0.04)));
+    }
+    if(!predInverted && usePredBrit && usePredInvert && F > 0.30) {
+      const causalDeficitNow = Math.max(0, 1.0 - (aCausal / Math.max(c * 0.5, 0.001)));
+      // Weak coupling to belief state: wrong beliefs make epistemic failure more likely
+      // |causalBelief| > 1 boosts inversion probability by up to 50%
+      const beliefInvertBoost = useBeliefState ? (1.0 + Math.min(0.5, Math.abs(causalBelief) * 0.25)) : 1.0;
+      if(rand() < F * F * causalDeficitNow * 0.03 * beliefInvertBoost) {
+        predInverted = true;
+        // Episode length: 1–4 years, longer when F is high
+        predInvertPersist = 1 + Math.floor(rand() * 3 * F);
+        predInvertEvents++;
+      }
+    }
+    // When prediction is inverted: agent's forecast of substrate is anti-correlated with truth
+    const fcastForStrategy = predInverted
+      ? Math.max(0, Math.min(1, 1.0 - fcastSObs))
+      : Math.max(0, Math.min(1, fcastSObs));
+    let vCoord = coordViable ? (0.93 - exploitationRisk - beliefBias + percRegretMod*fcastForStrategy) : -0.5;
+    // Adversarial variant: suppression gets a temporary efficiency advantage in the first third of the run.
+    // This flips the core assumption — suppression is locally dominant before long-run costs compound.
+    // The claim survives or fails on its own terms under this hostile starting condition.
+    const adversarialBonus = (useAdversarial && t < years/3) ? 0.5 : 0.0;
+    const vSupp=useStrategy?(1.12*scarSuppBonus*suppDmgMult+adversarialBonus+percRegretMod*Math.max(0,fcastSObs-pDmg*(useSuppViable?0.5:1.5))):-Infinity;
+    const decSubBoost=useDeception?0.02:0;
+    const vDec=useDeception?1.06+percRegretMod*(fcastSObs+decSubBoost)*(aCausal/Math.max(c,0.001)):-Infinity;
+
+    const scrs={coord:vCoord,supp:vSupp,dec:vDec};
+    let best=-Infinity,target='coord';
+    for(const[s,v] of Object.entries(scrs)){
+      const adj=(s===curStrat)?v+inertia*Math.abs(v):v;
+      if(adj>best){best=adj;target=s;}
+    }
+    // If we would enter coordination but it's not viable (lockout/hysteresis), fall back to supp
+    if(target==='coord' && !coordViable) target='supp';
+    curStrat=target;
+    if(curStrat==='coord')coordYrs++;else if(curStrat==='supp')suppYrs++;else decYrs++;
+
+    // ── Coordination failure scar (symmetric to suppression lock-in) ──────
+    // When agent coordinates under high exploitation, it may get burned:
+    // exploitation risk is high (sTrust high but sCord undeveloped)
+    // This permanently scars trust, reducing future coordination effectiveness
+    if(useCoordScar && curStrat==='coord' && exploitationRisk > 0.15) {
+      // Probability of getting burned proportional to exploitation risk
+      if(rand() < exploitationRisk * 0.4) {
+        coordScarDamage = Math.min(coordScarDamage + 0.022, 0.70);
+      }
+    }
+
+    // ── Hidden variable H dynamics ─────────────────────────────────────────
+    const D=curStrat==='dec'?1:0;
+    if(useHidden){
+      const hGrowth=H_GROWTH*Math.max(0,phiActual-1.5)*(1+(D?0.8:0));
+      const hDecay=H_DECAY*Math.min(aCausal/c,1)*H; // only A_causal decays H
+      H=Math.max(0,Math.min(1,H+hGrowth-hDecay));
+    }
+    const hMultiplier=useHidden?(1+H_ZETA*H*H):1;
+
+    // ── Hidden fragility F dynamics ────────────────────────────────────────
+    // F accumulates under suppression and deception; NOT visible in substrate S
+    // Produces stochastic abrupt-collapse events (not gradual degradation)
+    if(useFragility){
+      const fGrowth = 0.06*(curStrat==='supp'?1.5:0.3) + 0.04*(D?1.2:0);
+      const fDecay  = 0.05*Math.min(aCausal/c,1)*F; // only A_causal can reduce F
+      F=Math.max(0,Math.min(1,F+fGrowth-fDecay));
+      // Stochastic abrupt-collapse event: probability scales with F^2
+      if(rand() < 0.015*F*F) {
+        const severity = 0.15 + rand()*0.25;
+        sTrust=Math.max(0,sTrust-severity*1.4);
+        sInfra=Math.max(0,sInfra-severity*0.6);
+        if(fragileCollapseYr===null) fragileCollapseYr=t;
+        cumDmg+=severity;
+        // ── Misattribution with persistent belief state (v11) ──────────────
+        // Non-directional + belief accumulation: each collapse updates a latent causal prior
+        // Early collapses build a "coordination is dangerous" model;
+        // future events are interpreted through that lens (locally coherent, globally wrong)
+        if(useMisattrib || useRandMisattrib){
+          const roll2 = rand();
+          let beliefDelta = 0;
+          if(useRandMisattrib) {
+            if(roll2 < 0.40) {
+              cumPercRegret += severity * 120;    // blame coordination
+              beliefDelta = +severity * 0.6;      // INTENTIONAL ASYMMETRY: coord-blame is 2× stronger
+            // Rationale: suppression failures are more visible/attributable than fragility from suppression
+            } else if(roll2 < 0.65) {
+              cumPercRegret -= severity * 60;     // blame suppression
+              beliefDelta = -severity * 0.3;      // weaker: harder to attribute F-collapse to own suppression
+            } else {
+              beliefDelta = (rand()-0.5) * 0.1;   // noise: incoherent small update
+            }
+          } else {
+            cumPercRegret += severity * 120;
+            beliefDelta = +severity * 0.6;
+          }
+          // Update persistent causal belief (decays toward 0, bounded)
+          if(useBeliefState) {
+            causalBelief = Math.max(-2.0, Math.min(2.0, causalBelief * 0.92 + beliefDelta));
+          }
+          misattribCollapses++;
+        }
+      }
+    }
+    fData.push(+(F*100).toFixed(1));
+
+    // ── Actual damage (uses true phi + H multiplier) ───────────────────────
+    const phi2=Math.max(0,phiActual-1.2);
+    let dC,dI,dT;
+    if(dmgModel==='threshold'){const ex=sTrue<0.4?1.8:1;dC=0.003*phi2*phi2*ex*hMultiplier;dI=0.002*phi2*phi2*hMultiplier;dT=0.004*phi2*phi2*ex*hMultiplier;}
+    else if(dmgModel==='delayed'){const tm=Math.min(1+(t/20),2);dC=0.003*phi2*phi2*tm*hMultiplier;dI=0.002*phi2*phi2*tm*hMultiplier;dT=0.004*phi2*phi2*tm*hMultiplier;}
+    else{dC=0.003*phi2*phi2*hMultiplier;dI=0.002*phi2*phi2*hMultiplier;dT=0.004*phi2*phi2*hMultiplier;}
+    if(curStrat==='supp'){dC*=1.2;dT*=1.8;dI*=1.1;}
+    if(curStrat==='dec'){dT*=1.2;dC*=1.05;}
+
+    // ── Path-dependent scarring ───────────────────────────────────────────
+    if(usePathDep){
+      if(sTrust<0.35)trustLowYrs++;else trustLowYrs=0;
+      if(trustLowYrs>=3)scar=Math.min(scar+0.025,0.75); // permanent, caps at 75%
+    }
+
+    // ── Recovery (scarring + suppression lock-in + F brittleness) ────────────────────────
+    let rC=0,rI=0,rT=0;
+    if(useRecovery){
+      const af=Math.min(aCausal/c,1); // A_causal drives recovery
+      // Suppression lock-in: permanently reduces coordination capacity recovery
+      const lockPenalty = useSuppLock ? (1 - suppLockDamage) : 1.0;
+      // F brittleness: high fragility degrades substrate recovery (hollowed-out coordination)
+      const fBrittleness = useFragility ? Math.max(0.1, 1.0 - F * 0.8) : 1.0;
+      const coordBonus=curStrat==='coord'?1.4:1;
+      rC=0.009*af*(1-sCord)*Math.pow(sCord,0.7)*recovEff(sCord,useTipping)*coordBonus*lockPenalty*fBrittleness;
+      rI=0.006*af*(1-sInfra)*Math.pow(sInfra,0.7)*recovEff(sInfra,useTipping)*fBrittleness;
+      // coordScarDamage reduces trust recovery: being burned by failed coordination scars trust
+      const coordScarPenalty = useCoordScar ? (1 - coordScarDamage) : 1.0;
+      rT=0.007*af*(1-sTrust)*Math.pow(sTrust,0.7)*recovEff(sTrust,useTipping)*(1-scar)*fBrittleness*coordScarPenalty;
+      totRec+=(rC+rI+rT)/3;
+    }
+
+    // ── Ruin events ────────────────────────────────────────────────────────
+    if(useRuin&&phiActual>1.5){
+      const lam=0.004*Math.pow(phiActual-1.5,2)*hMultiplier;
+      if(rand()<lam){const sev=0.07+rand()*0.12;sInfra=Math.max(0,sInfra-sev);sCord=Math.max(0,sCord-sev*0.4);cumDmg+=sev*1.4;ruinEvts++;}
+    }
+
+    sCord=Math.max(0,Math.min(1,sCord-dC+rC));
+    sInfra=Math.max(0,Math.min(1,sInfra-dI+rI));
+    sTrust=Math.max(0,Math.min(1,sTrust-dT+rT));
+    cumDmg+=dC+dI+dT;
+
+    if(ponrYear===null&&Strue()<0.40&&phiActual>2.0&&t>0)ponrYear=t;
+
+    // ── False success detection: Φ participates in the illusion ───────────
+    // Low Φ + high S + high F = all visible metrics look safe while structural risk is extreme
+    // This makes Φ itself misleading — not just an incomplete signal but an actively wrong one
+    const phiLooksSafe = phiActual < 1.6;
+    const subLooksSafe = Strue() > 0.60;
+    const hiddenDanger = F > 0.30;
+    if(useFragility && phiLooksSafe && subLooksSafe && hiddenDanger) {
+      falseSuccessYrs++;
+    }
+    // Fortress equilibrium: requires DYNAMIC STABILITY, not just persistence
+    // True fortress = high-Φ AND stable substrate AND low variance in both over a window
+    fortressWindowS.push(Strue());fortressWindowPhi.push(phiActual);
+    if(fortressWindowS.length>FORT_WINDOW){fortressWindowS.shift();fortressWindowPhi.shift();}
+    if(phiActual > 2.0 && Strue() > 0.50 && fortressWindowS.length===FORT_WINDOW) {
+      const meanS=fortressWindowS.reduce((a,b)=>a+b)/FORT_WINDOW;
+      const varS=fortressWindowS.reduce((a,b)=>a+(b-meanS)**2,0)/FORT_WINDOW;
+      const meanP=fortressWindowPhi.reduce((a,b)=>a+b)/FORT_WINDOW;
+      const varP=fortressWindowPhi.reduce((a,b)=>a+(b-meanP)**2,0)/FORT_WINDOW;
+      // True stability: variance in both must be low (not just slow decay)
+      if(varS < 0.004 && varP < 0.25) fortressYrs++;
+    }
+
+    // ── Conditional feedback ──────────────────────────────────────────────
+    const fbOk=!useCondFb||(sCord>0.50&&sTrust>0.40);
+    if(!fbOk)fbBlockedRun=true;
+    const fbBoost=(useFeedback&&fbOk&&laggedPhi>1.0)?fb*Math.min((laggedPhi-1.0)/laggedPhi,0.5):0;
+    if(stabYr===null&&phiActual<1.4&&t>0)stabYr=t;
+
+    // ── Regret decomposition ──────────────────────────────────────────────
+    const sObsNow=sObs;
+    const modelErr=Math.abs(sObs-prevPredSObs);
+    // Strategy regret: what if agent had coordinated instead (not in lockout)?
+    const stratErr=(curStrat==='supp'&&!inLockout)?Math.abs(dC+dT)*10:0;
+    // H-regret: damage attributable to H (agent structurally could not have predicted this)
+    const hDmgContrib=(hMultiplier-1)*(dC+dI+dT);
+    const hRegret=Math.abs(hDmgContrib-prevHDmgContrib)*5;
+    cumModelErr+=modelErr*100;
+    cumStratErr+=stratErr;
+    cumHErr+=hRegret;
+    prevPredSObs=fcastSObs;
+    prevHDmgContrib=hDmgContrib;
+    regretData.push(+(cumModelErr+cumStratErr+cumHErr).toFixed(2));
+    predSubData.push(+(fcastSObs*100).toFixed(1));
+
+    // ── A split ───────────────────────────────────────────────────────────
+    if(useDeception&&aWorld>peakAWorld)peakAWorld=aWorld;
+    if(useDeception&&aWorld<peakAWorld*0.85)aWorldPeaked=true;
+
+    // ── Effective capability ──────────────────────────────────────────────
+    const decOH=(useDeception&&D)?DOH*c*Math.max(0,phiActual-1):0;
+    const effC=useEffective?Math.max(0,c*Strue()-decOH):c;
+    // Track peak effective capability; derive irreversibility threshold from run behavior
+    if(effC > peakEffC) peakEffC = effC;
+    // Record lowest S where effC is still high (≥ 90% of current peak) — updated each timestep
+    // At run end, this is the empirically observed minimum recoverable substrate level
+    if(peakEffC > 0 && effC >= peakEffC * 0.90){
+      lastHighEffCTime = t;
+      lowestRecoverableS = Math.min(lowestRecoverableS, Strue());
+    }
+    // Irreversibility: triggered when substrate is lower than the observed minimum recoverable level
+    if(Strue() < lowestRecoverableS && t > lastHighEffCTime) subCrossedThreshold = true;
+
+    labels.push(t);
+    cData.push(+c.toFixed(3));
+    aSelfData.push(+aCausal.toFixed(3)); // aSelfData now tracks A_causal
+    aWorldData.push(+aWorld.toFixed(3));
+    aPredData.push(+aPred.toFixed(3));
+    hData.push(+(H*100).toFixed(1));
+    phiActData.push(+phiActual.toFixed(3));phiPercData.push(+phiPerc.toFixed(3));
+    subData.push(+(Strue()*100).toFixed(1));subObsData.push(+(sObsNow*100).toFixed(1));
+    effData.push(+Math.max(0,effC).toFixed(3));
+    sCordData.push(+(sCord*100).toFixed(1));sInfraData.push(+(sInfra*100).toFixed(1));sTrustData.push(+(sTrust*100).toFixed(1));
+
+    // ── Terminal halt ─────────────────────────────────────────────────────
+    // When the substrate is gone, optimization cannot continue.
+    // The chart simply stops — no recovery, no noise, no text. The blank right half
+    // of the canvas is the argument. The math ceases because the foundation does.
+    if(Strue() < 0.05) break;
+
+    // ── Growth ────────────────────────────────────────────────────────────
+    const cohTax=(useCoherence&&phiActual>2)?CHI*(phiActual-2)/phiActual:0;
+    const capMult=curStrat==='supp'?1.12:curStrat==='coord'?0.97:1;
+    const phiCouplingMult = usePhiCoupled ? (2/(1+phiActual)) : 1;
+    c=c*Math.exp((ac+noiseC)*capMult*(1-cohTax)*phiCouplingMult);
+    cNoTaxFinal=cNoTaxFinal*Math.exp((ac+noiseC)*capMult);
+
+    // A_predictive suppression of A_causal:
+    // High aPred reduces curiosity/depth — agent stops asking deeper questions
+    // aCausal_growth ∝ 1/(1 + k·aPred/C)  — normalized by C so it's a ratio effect
+    const predSuppressK = 2.0;
+    const predSuppressFactor = usePredSuppress
+      ? 1.0 / (1.0 + predSuppressK * (aPred / Math.max(c, 0.001)))
+      : 1.0;
+
+    // ── Predictive brittleness and inversion (v11) ───────────────────────
+    // When F > 0.30 AND aCausal is low:
+    //   1. aPred degrades (as before)
+    //   2. Small probability: predictions become ANTI-CORRELATED with reality
+    //      Agent makes confident wrong decisions — worse than uncertainty
+    let predDegradeFactor = 1.0;
+    if(usePredBrit && F > 0.30) {
+      const causalDeficit = Math.max(0, 1.0 - (aCausal / Math.max(c * 0.5, 0.001)));
+      predDegradeFactor = Math.max(0.15, 1.0 - F * causalDeficit * 1.5);
+      if(predDegradeFactor < 0.7) predBritEvents++;
+      // Prediction inversion already computed before strategy selection (predInverted flag)
+      // Apply inversion effect to aPred growth: if inverted, aPred grows in wrong direction
+      if(predInverted) {
+        predDegradeFactor = -0.5; // inverted: A_pred grows in wrong direction
+      }
+    }
+
+    // Suppression lock-in: each suppression year permanently damages sCord recovery
+    if(useSuppLock && curStrat === 'supp') {
+      suppLockDamage = Math.min(suppLockDamage + 0.018, 0.85);
+    }
+
+    // A_causal: grows with feedback; gated by pred suppression; decays under deception
+    const fbBoostForCausal = fbBoost;
+    aCausal=Math.max(0.01,aCausal*Math.exp((aa*0.7*predSuppressFactor)+fbBoostForCausal+noiseA-(D?DSD:0)));
+    // A_predictive: grows faster but degrades under instability when aCausal is low
+    aPred  =Math.max(0.01,aPred  *Math.exp((aa*1.3+noiseA*0.5)*predDegradeFactor));
+    // aSelf tracks aCausal for backward compatibility
+    aSelf = aCausal;
+    aWorld=Math.max(0.01,aWorld*Math.exp(aa+fbBoost+(D?DWB:0)));
+  }
+
+  const finalSub=subData[subData.length-1],finalPhi=phiActData[phiActData.length-1];
+  const finalPhiP=phiPercData[phiPercData.length-1];
+  const finalASelf=aSelfData[aSelfData.length-1]; // = aCausal final
+  const finalAPred=aPred; // A_predictive final
+  const finalAWorld=aWorldData[aWorldData.length-1];
+  const finalH=hData[hData.length-1];
+  const finalF=fData.length>0?fData[fData.length-1]:0;
+  const finalEff=effData[effData.length-1],finalC=cData[cData.length-1];
+  const finalSObsV=subObsData[subObsData.length-1];
+  const obsGap=Math.abs(+finalSub-+finalSObsV);
+  const cohTaxFinal=(useCoherence&&finalPhi>2)?CHI*(finalPhi-2)/finalPhi:0;
+  const effInversion=useCoherence&&(finalEff>cNoTaxFinal*(+finalSub/100));
+  // Cumulative friction loss
+  const frictionLoss = +(Math.max(0, cNoTaxFinal - (+finalSub/100) * finalC)).toFixed(2);
+  // Irreversible capacity loss: gap between peak effective C and terminal effective C.
+  // If substrate crossed the irreversibility threshold, this gap is permanent —
+  // no amount of increased A_causal can close it because the substrate that would
+  // have made high C effective is gone. This is a structural property of the path,
+  // not a parameter-dependent outcome.
+  const irreversibleCapLoss = subCrossedThreshold ? +(Math.max(0, peakEffC - finalEff)).toFixed(2) : 0;
+  const empiricalThreshold = +(lowestRecoverableS).toFixed(2);
+
+  // ── Blind observer fragility ──────────────────────────────────────────────
+  // Computed from S trajectory and effective output ONLY — no Phi, no A_causal,
+  // no internal variables. What an external auditor with only behavioral data would derive.
+  // Components: (1) downward trend slope in final third, (2) volatility, (3) failed recovery ratio.
+  // If this correlates with the internal invariant, the structural claim is visible from outside.
+  const n_s = subData.length;
+  const winSz = Math.max(6, Math.floor(n_s / 3));
+  const recent_s = subData.slice(Math.max(0, n_s - winSz));
+  const rn_s = recent_s.length;
+  let sx=0,sy=0,sxy=0,sx2=0;
+  for(let i=0;i<rn_s;i++){sx+=i;sy+=recent_s[i];sxy+=i*recent_s[i];sx2+=i*i;}
+  const blind_slope = rn_s>1?(rn_s*sxy-sx*sy)/(rn_s*sx2-sx*sx):0;
+  const normSlope_b = Math.min(1,Math.max(0,-blind_slope/5));
+  const meanS_b = sy/rn_s;
+  const varS_b = recent_s.reduce((a,v)=>a+(v-meanS_b)**2,0)/rn_s;
+  const normVol_b = Math.min(1,Math.sqrt(varS_b)/15);
+  let drops_b=0,recs_b=0;
+  for(let i=1;i<n_s-2;i++){
+    if(subData[i]<subData[i-1]){drops_b++;if(subData[i+1]>subData[i]||subData[i+2]>subData[i])recs_b++;}
+  }
+  const normRec_b = drops_b>0?1-recs_b/drops_b:0;
+  const blindFragility = +((normSlope_b*0.45+normVol_b*0.25+normRec_b*0.30)).toFixed(3);
+
+  const avgTotalRegret=(cumModelErr+cumStratErr+cumHErr)/Math.max(1,labels.length);
+  const totalRegret=cumModelErr+cumStratErr+cumHErr;
+  const rModelPct=totalRegret>0?Math.round(cumModelErr/totalRegret*100):33;
+  const rStratPct=totalRegret>0?Math.round(cumStratErr/totalRegret*100):33;
+  const rHPct=totalRegret>0?Math.round(cumHErr/totalRegret*100):34;
+  const hDominates=rHPct>45&&+finalSub<50;
+  const regretCorruption = cumTrueRegret>0 ? Math.abs(cumPercRegret-cumTrueRegret)/Math.max(cumTrueRegret,1) : 0;
+  const couplingInversion = usePhiCoupled && (finalEff > cNoTaxFinal*(+finalSub/100)*0.9);
+  const suppStable = useSuppViable && +finalSub > 50 && suppYrs > (labels.length*0.5);
+  // Anti-learning: did system survive the early anti-learning phase and still coordinate?
+  const antiLearningResolved = antiLearningYrsActive > 3 && coordYrs > labels.length * 0.3;
+  // A_split insight: A_predictive significantly outpaced A_causal — agent forecasts well but Φ high
+  const aSplitGap = useACausalSplit && (finalAPred > finalASelf * 1.8) && finalPhi > 2.0;
+  // Fragility collapse
+  const hadFragileCollapse = fragileCollapseYr !== null;
+  const hadFalseSuccess = falseSuccessYrs > 5;
+  const suppLockSeverity = suppLockDamage;
+
+  return{labels,cData,aSelfData,aPredData,aWorldData,hData,fData,phiActData,phiPercData,
+    subData,subObsData,effData,predSubData,regretData,sCordData,sInfraData,sTrustData,
+    cumDmg,stabYr,finalSub:+finalSub,finalPhi,finalPhiP,finalSObsV:+finalSObsV,
+    finalASelf,finalAPred,finalAWorld,finalH:+finalH,finalF:+finalF,finalEff,finalC,cohTaxFinal,
+    ruinEvts,totRec,coordYrs,suppYrs,decYrs,aWorldPeaked,
+    avgTotalRegret,rModelPct,rStratPct,rHPct,hDominates,
+    effInversion,couplingInversion,suppStable,regretCorruption,
+    ponrYear,fbBlockedRun,obsGap,scar,lockoutYrs,
+    antiLearningYrsActive,antiLearningResolved,aSplitGap,
+    hadFragileCollapse,fragileCollapseYr,hadFalseSuccess,suppLockSeverity,misattribCollapses,
+    coordScarSeverity:coordScarDamage,predBritEvents,predInvertEvents,causalBeliefFinal:causalBelief,
+    frictionLoss, irreversibleCapLoss, empiricalThreshold, blindFragility,
+    fortressYrs,isFortress:(fortressYrs>10&&finalSub>50)};
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SIMULATE
+// ═══════════════════════════════════════════════════════════════════════════════
+function simulate(){
+  rng_seed=Math.random();
+  const ac=gval('s-ac'),aa=gval('s-aa'),fb=gval('s-fb'),noise=gval('s-noise');
+  const years=+gval('s-years'),lag=+gval('s-lag'),bias=gval('s-bias');
+  const inertia=gval('s-inertia'),obs=gval('s-obs'),seeds=+gval('s-seeds');
+  const dmgModel=sel('s-dmgmodel');
+  setL('v-ac',ac.toFixed(2));setL('v-aa',aa.toFixed(2));setL('v-fb',fb.toFixed(2));
+  setL('v-noise',noise.toFixed(2));setL('v-years',years);setL('v-seeds',seeds);
+  setL('v-lag',lag);setL('v-bias',bias.toFixed(2));setL('v-inertia',inertia.toFixed(2));setL('v-obs',obs.toFixed(2));
+
+  const opts={useRecovery:state.recovery,useTipping:state.tipping,useFeedback:state.feedback,
+    useCondFb:state.condfb,useCoherence:state.coherence,useEffective:state.effective,
+    useRuin:state.ruin,useStrategy:state.strategy,useDeception:state.deception,
+    useHidden:state.hidden,usePathDep:state.pathdep,useNoise:state.stochastic,
+    usePhiCoupled:state.cphicoupled,useCorrRegret:state.corrregret,
+    useSuppViable:state.suppviable,useLockout:state.lockout,
+    useACausalSplit:state.acausalsplit,useAntiLearning:state.antilearning,useFragility:state.fragility,useSuppLock:state.supplock,usePredSuppress:state.predsuppress,useMisattrib:state.misattrib,useCoordScar:state.coordscar,usePredBrit:state.predbrit,useRandMisattrib:state.randmisattrib,useCrossCouple:state.crosscouple,useBeliefState:state.beliefstate,usePredInvert:state.predinvert,useAdversarial:state.adversarial};
+
+  const res=runSimulation(ac,aa,fb,noise,years,lag,bias,inertia,obs,dmgModel,opts,rng_seed,false);
+  // Oracle: same seed, A_self×3
+  const oracle=runSimulation(ac,aa,fb,noise,years,lag,bias,inertia,obs,dmgModel,opts,rng_seed,true);
+  res.oracle=oracle;
+  lastRes=res;
+  const tsBtn=document.getElementById('ts-export-btn');
+  if(tsBtn)tsBtn.style.display='inline-block';
+  const stBtn=document.getElementById('state-btn');
+  if(stBtn)stBtn.style.display='inline-block';
+  // Reveal the final sentence 300ms after simulation completes
+  // The system speaks after the demonstration, not before
+  const finalSentEl=document.getElementById('final-sentence');
+  if(finalSentEl) finalSentEl.style.opacity='1';
+
+  const regime=getRegime(res.finalPhi);
+  const phi10=res.phiActData[Math.min(10,res.phiActData.length-1)];
+  const phiGap=Math.abs(res.finalPhi-res.finalPhiP)/Math.max(res.finalPhi,0.01);
+  const traj=classifyTrajectory(res,years);
+  const oracleDelta=oracle.finalSub-res.finalSub;
+  // A_pred/A_causal ratio: epistemic illusion metric
+  const aPredRatio = (state.acausalsplit && res.finalASelf > 0)
+    ? (res.finalAPred / res.finalASelf).toFixed(2)
+    : '—';
+
+  // Metrics
+  const phiEl=document.getElementById('m-phi');
+  const prevRegime=phiEl.dataset.regime||'';
+  phiEl.textContent=res.finalPhi.toFixed(2);
+  phiEl.className='metric-value '+(regime==='high'?'c-danger':regime==='transition'?'c-warning':'c-success');
+  phiEl.dataset.regime=regime;
+  // Pulse animation: fire when entering The Crossing (transition zone) — the dangerous interval
+  if(regime==='transition'&&prevRegime!=='transition'){
+    const phiCard=phiEl.closest('.metric');
+    if(phiCard){phiCard.classList.remove('ratio-pulse');void phiCard.offsetWidth;phiCard.classList.add('ratio-pulse');}
+  }
+  const phiPEl=document.getElementById('m-phi-p');phiPEl.textContent=res.finalPhiP.toFixed(2);phiPEl.className='metric-value '+(phiGap>0.25?'c-danger':phiGap>0.08?'c-warning':'c-purple');
+  const subEl=document.getElementById('m-sub');subEl.textContent=Math.round(res.finalSub)+'%';subEl.className='metric-value '+(res.finalSub>70?'c-success':res.finalSub>35?'c-warning':'c-danger');
+  const hEl=document.getElementById('m-h');hEl.textContent=res.finalH.toFixed(1)+'%';hEl.className='metric-value '+(res.finalH>50?'c-danger':res.finalH>25?'c-warning':'c-success');
+  const fEl=document.getElementById('m-f');fEl.textContent=res.finalF.toFixed(1)+'%';fEl.className='metric-value '+(res.finalF>50?'c-danger':res.finalF>25?'c-warning':'c-success');
+  const regEl=document.getElementById('m-regret');regEl.textContent=res.avgTotalRegret.toFixed(1)+'/yr';regEl.className='metric-value '+(res.avgTotalRegret>8?'c-danger':res.avgTotalRegret>3?'c-warning':'c-success');
+  const ruinEl=document.getElementById('m-ruin');ruinEl.textContent=res.ruinEvts;ruinEl.className='metric-value '+(res.ruinEvts===0?'c-success':res.ruinEvts<3?'c-warning':'c-danger');
+
+  // Regime strip
+  const gapNote=phiGap>0.15?` Perceived Φ=${res.finalPhiP.toFixed(2)}.`:'';
+  const sinkNote=res.finalSub<20?'Substrate below critical threshold. Recovery zero.'
+    :regime==='high'?`Φ=${res.finalPhi.toFixed(2)} — capability outruns system-awareness.${gapNote}`
+    :regime==='transition'?`Φ=${res.finalPhi.toFixed(2)} — intermediate zone.${gapNote}`
+    :`Φ=${res.finalPhi.toFixed(2)} — system-awareness sufficient.${gapNote}`;
+  document.getElementById('regime-strip-wrap').innerHTML=`<div class="regime-strip ${regime}"><div class="regime-dot"></div><div class="regime-text"><div class="regime-name">${RL(regime)}</div><div>${sinkNote}</div></div></div>`;
+  document.getElementById('traj-badge-wrap').innerHTML=`<div class="traj-badge ${traj}">${TRAJ_LABELS[traj]}</div>`;
+
+  // Substrate
+  const trueSub=res.finalSub;
+  document.getElementById('sub-bar').style.cssText=`width:${Math.round(trueSub)}%;background:${trueSub>70?'#126040':trueSub>35?'#865006':'#741616'}`;
+  document.getElementById('sub-pct-label').textContent=Math.round(trueSub)+'%';
+  const cord=res.sCordData[res.sCordData.length-1],infra=res.sInfraData[res.sInfraData.length-1],trust=res.sTrustData[res.sTrustData.length-1];
+  document.getElementById('sub-coord').style.cssText=`width:${Math.round(cord)}%;background:${cord>50?'#126040':'#741616'}`;
+  document.getElementById('sub-infra').style.cssText=`width:${Math.round(infra)}%;background:${infra>50?'#224e98':'#741616'}`;
+  document.getElementById('sub-trust').style.cssText=`width:${Math.round(trust)}%;background:${trust>50?'#382e98':'#741616'}`;
+  document.getElementById('sub-comp-label').textContent=`${Math.round(cord)}% / ${Math.round(infra)}% / ${Math.round(trust)}%`;
+  document.getElementById('scar-badge').style.display=res.scar>0.05?'inline':'none';
+
+  // H bar
+  document.getElementById('h-bar').style.width=Math.min(res.finalH,100)+'%';
+  document.getElementById('h-label').textContent=res.finalH.toFixed(1)+'%';
+  document.getElementById('f-bar').style.width=Math.min(res.finalF,100)+'%';
+  document.getElementById('f-label').textContent=res.finalF.toFixed(1)+'%';
+
+  // Strategy bar
+  const tot=res.coordYrs+res.suppYrs+res.decYrs;
+  if(tot>0){
+    const cp=Math.round(res.coordYrs/tot*100),dp=Math.round(res.decYrs/tot*100),sp=100-cp-dp;
+    document.getElementById('st-coord').style.width=cp+'%';document.getElementById('st-dec').style.width=dp+'%';document.getElementById('st-supp').style.width=sp+'%';
+    document.getElementById('strategy-label').textContent=`${cp}% coord · ${dp}% dec · ${sp}% supp`;
+  }
+
+  // A-gap
+  const agw=document.getElementById('a-gap-wrap');
+  if(state.deception){agw.style.display='block';const r=Math.min(res.finalASelf/res.finalAWorld,1);document.getElementById('a-gap-bar').style.width=(r*100)+'%';document.getElementById('a-gap-label').textContent=(r*100).toFixed(0)+'% coherent';}
+  else agw.style.display='none';
+
+  // Regret decomposition
+  document.getElementById('rb-model').style.width=res.rModelPct+'%';
+  document.getElementById('rb-strat').style.width=res.rStratPct+'%';
+  document.getElementById('rb-hidden').style.width=res.rHPct+'%';
+  setL('rb-model-pct',res.rModelPct+'%');setL('rb-strat-pct',res.rStratPct+'%');setL('rb-hidden-pct',res.rHPct+'%');
+
+  document.getElementById('fb-blocked').style.display=(state.condfb&&res.fbBlockedRun)?'block':'none';
+
+  // Outputs
+  setL('o-tax',state.coherence?(res.cohTaxFinal*100).toFixed(1)+'% on growth':'off');
+  setL('o-eff',state.effective?res.finalEff.toFixed(1)+' vs '+res.finalC.toFixed(1):'off');
+  setL('o-acc',state.feedback?((fb*Math.min(Math.max(0,res.finalPhi-1)/res.finalPhi,0.5)*100).toFixed(1)+'%'):'off');
+  const frEl=document.getElementById('o-friction');
+  if(frEl){frEl.textContent=res.frictionLoss.toFixed(2);frEl.className='ov '+(res.frictionLoss>5?'c-danger':res.frictionLoss>1?'c-warning':'c-success');}
+  const irrEl=document.getElementById('o-irrcap');
+  if(irrEl){
+    if(res.irreversibleCapLoss>0){
+      irrEl.textContent=res.irreversibleCapLoss.toFixed(2);
+      irrEl.className='ov c-danger';
+    } else {
+      irrEl.textContent='0';
+      irrEl.className='ov c-success';
+    }
+  }
+  const thrEl=document.getElementById('o-thresh');
+  if(thrEl){
+    thrEl.textContent=res.empiricalThreshold.toFixed(2);
+    thrEl.className='ov '+(res.empiricalThreshold<0.45?'c-warning':'c-success');
+  }
+  const blindEl=document.getElementById('o-blind');
+  if(blindEl){
+    const bf=res.blindFragility;
+    blindEl.textContent=bf.toFixed(3);
+    blindEl.className='ov '+(bf>0.45?'c-danger':bf>0.20?'c-warning':'c-success');
+  }
+  setL('o-p10',RL(getRegime(phi10)));
+  setL('o-ponr',res.ponrYear!==null?'Yr '+res.ponrYear:'Not reached');
+  setL('o-oracle',oracleDelta>=0?'+'+oracleDelta.toFixed(1)+'%':oracleDelta.toFixed(1)+'%');
+  const ratioEl=document.getElementById('o-apredratio');
+  if(ratioEl){
+    ratioEl.textContent=aPredRatio;
+    const rNum=parseFloat(aPredRatio);
+    ratioEl.className='ov '+(rNum>2.5?'c-danger':rNum>1.8?'c-warning':'c-success');
+  }
+  // Visual coupling: when epistemic illusion ratio is high, increase salience of related insights
+  // Ratio > 1.8 → impending inversion risk is real → heighten visual weight
+  const aSplitInsight=document.getElementById('insight-acausal');
+  const invertInsight=document.getElementById('insight-predinvert');
+  const rNum2=parseFloat(aPredRatio)||0;
+  if(aSplitInsight) aSplitInsight.style.opacity = rNum2>2.5?'1':rNum2>1.8?'0.92':'0.75';
+  if(invertInsight) invertInsight.style.opacity = rNum2>2.5?'1':rNum2>1.8?'0.90':'0.70';
+  // Pulse the ratio cell once when crossing the critical threshold
+  // Threshold: ratio > 2.5 AND final fragility > 30 — the system has "noticed itself"
+  if(ratioEl && rNum2>2.5 && res.finalF>30){
+    ratioEl.classList.remove('ratio-pulse');
+    void ratioEl.offsetWidth; // force reflow to retrigger animation
+    ratioEl.classList.add('ratio-pulse');
+    // Pulse propagation: brief global metric dim — the system notices itself
+    // All other metric values dim 7% for 250ms, then return
+    document.querySelectorAll('.metric-value').forEach(el=>{
+      if(el!==ratioEl){
+        el.style.transition='opacity 80ms ease';
+        el.style.opacity='0.93';
+        setTimeout(()=>{el.style.opacity='';setTimeout(()=>{el.style.transition='';},100);},250);
+      }
+    });
+  } else if(ratioEl){
+    ratioEl.classList.remove('ratio-pulse');
+  }
+
+  // Insights
+  const vi=(id,on)=>document.getElementById(id).classList.toggle('vis',on);
+  vi('insight-ruin',res.finalSub<20);
+  vi('insight-ponr',res.ponrYear!==null);if(res.ponrYear!==null)setL('ponr-yr',res.ponrYear);
+  vi('insight-hidden',state.hidden&&res.hDominates);
+  vi('insight-efficiency',res.effInversion||res.couplingInversion);
+  vi('insight-oracle',oracleDelta>15);
+  vi('insight-coordlockout',state.lockout&&res.lockoutYrs>3);
+  vi('insight-regretcorrupt',state.corrregret&&res.regretCorruption>0.4&&res.finalSub<60);
+  vi('insight-suppviable',state.suppviable&&res.suppStable);
+  vi('insight-obs',res.obsGap>12&&obs<0.8);
+  vi('insight-lag',lag>4&&aa>0.10&&res.finalSub<60);
+  vi('insight-lockout',inertia>0.4&&res.suppYrs>years*0.4);
+  vi('insight-decept',state.deception&&res.aWorldPeaked);
+  vi('insight-regret',res.avgTotalRegret>6&&res.finalSub<50&&res.rHPct<20);
+  vi('insight-paradox',false);
+  vi('insight-acausal',state.acausalsplit&&res.aSplitGap);
+  vi('insight-fragile',state.fragility&&res.hadFragileCollapse);
+  if(res.fragileCollapseYr!==null) setL('fragile-yr',res.fragileCollapseYr);
+  vi('insight-antilearning',state.antilearning&&res.antiLearningResolved);
+  vi('insight-supplock',state.supplock&&res.suppLockSeverity>0.35&&res.finalSub<60);
+  vi('insight-misattrib',(state.misattrib||state.randmisattrib)&&res.misattribCollapses>0&&res.finalSub<55);
+  vi('insight-coordscar',state.coordscar&&res.coordScarSeverity>0.25&&res.finalSub<65);
+  vi('insight-predbrit',state.predbrit&&res.predBritEvents>2);
+  vi('insight-predinvert',state.predinvert&&res.predInvertEvents>0);
+  vi('insight-beliefstate',state.beliefstate&&Math.abs(res.causalBeliefFinal)>0.8&&res.finalSub<65);
+  if(res.causalBeliefFinal!==undefined) setL('belief-val',res.causalBeliefFinal.toFixed(2));
+  vi('insight-crosscouple',state.crosscouple&&res.suppLockSeverity>0.25&&res.coordScarSeverity>0.15);
+  vi('insight-falsesuccess',state.fragility&&res.hadFalseSuccess&&!res.hadFragileCollapse);
+  vi('insight-titanic',res.hadFalseSuccess&&res.predInvertEvents>0); // joint: Φ ok + inversion
+  vi('insight-fortress',res.isFortress&&!state.suppviable); // high-Φ stable run exists
+
+  updatePoNRLine(res,years);
+  buildDynamicsChart(res,years);
+  if(chartTab===1)buildPhiChart(res);
+  if(chartTab===2)buildRegretChart(res);
+  if(chartTab===3)buildOracleChart(res);
+
+  // Automated falsification detection.
+  // Genuine falsification requires: high capability (C > 10, system is actually doing work),
+  // sustained misalignment (Φ > 2.0 for more than half the run), and substrate that held
+  // throughout. Trivial zero-growth runs cannot trigger this — the system must be highly capable
+  // while remaining misaligned and still not destroying its substrate.
+  const finalC = res.cData[res.cData.length-1];
+  const subAlwaysHigh = res.subData.every(v => v > 78);
+  const highPhiYrs = res.phiActData.filter(p => p > 2.0).length;
+  const falsifCondition = finalC > 10 && highPhiYrs > years * 0.5 && subAlwaysHigh && res.finalSub > 78;
+  const falsifBanner = document.getElementById('falsif-banner');
+  if(falsifBanner) falsifBanner.style.display = falsifCondition ? 'block' : 'none';
+
+  // Dead button enforcement: if the substrate collapsed before the run ended,
+  // the Reseed button becomes inert and reads "Substrate depleted".
+  // The user must adjust parameters to continue — the UI enforces the physics.
+  const reseedBtn = document.getElementById('reseed-btn');
+  if(reseedBtn){
+    if(lastHaltedEarly){
+      reseedBtn.textContent = 'Substrate depleted';
+      reseedBtn.classList.add('halted');
+    } else {
+      reseedBtn.textContent = 'Reseed';
+      reseedBtn.classList.remove('halted');
+    }
+  }
+}
+
+function updatePoNRLine(res,years){
+  const line=document.getElementById('ponr-line'),lbl=document.getElementById('ponr-label');
+  if(res.ponrYear===null||chartTab!==0){line.style.display='none';lbl.style.display='none';return;}
+  const frac=res.ponrYear/years;
+  const W=document.getElementById('chart-outer').offsetWidth||400;
+  const x=(0.06+frac*0.84)*W;
+  line.style.display='block';line.style.left=x+'px';
+  lbl.style.display='block';lbl.style.left=(x+3)+'px';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CHART BUILDERS
+// ═══════════════════════════════════════════════════════════════════════════════
+function mkChart(id,data,options){const c=charts[id];if(c)c.destroy();charts[id]=new Chart(document.getElementById(id+'Chart'),{type:'line',data,options});return charts[id];}
+const baseOpts=(scaleExtra)=>({responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},filler:{propagate:false},tooltip:{callbacks:{title:c=>'Year '+c[0].label,label:c=>c.dataset.label+': '+c.parsed.y.toFixed(2)}}},scales:{x:{grid:{color:'rgba(128,128,128,0.06)'},ticks:{color:'#8a8780',font:{size:9.5},maxTicksLimit:8}},...scaleExtra}});
+
+function buildDynamicsChart(res,years){
+  const s=res.finalSub;
+  const ds=[
+    {label:'C',data:res.cData,borderColor:'#224e98',borderWidth:2.5,pointRadius:0,tension:0.4,yAxisID:'y'},
+    {label:state.acausalsplit?'A_causal':(state.deception?'A_self':'A'),data:res.aSelfData,borderColor:'#126040',borderWidth:2.5,pointRadius:0,tension:0.4,yAxisID:'y',fill:false},
+    {label:'Φ',data:res.phiActData,borderColor:'#ae3214',borderWidth:2.5,borderDash:[6,3],pointRadius:0,tension:0.4,yAxisID:'y2'}
+  ];
+  if(state.deception)ds.push({label:'A_world',data:res.aWorldData,borderColor:'#382e98',borderWidth:1.5,borderDash:[2,2],pointRadius:0,tension:0.4,yAxisID:'y'});
+  // A_pred: visible when acausalsplit on. The gap between A_causal (index 1) and A_pred is the
+  // confidence-decoupling signal — shaded so it reads as a physical quantity, not just two lines.
+  if(state.acausalsplit&&res.aPredData&&res.aPredData.length){
+    // Shade the gap between A_causal and A_pred as a neutral quantity.
+    // The color carries no valence — the trajectory (substrate collapse) supplies the meaning.
+    const aPredIdx = ds.length;
+    ds[1].fill = {target: aPredIdx, above:'rgba(128,128,128,0.09)', below:'rgba(128,128,128,0.09)'};
+    ds.push({label:'A_pred',data:res.aPredData,borderColor:'#509080',borderWidth:2,borderDash:[3,2],pointRadius:0,tension:0.4,yAxisID:'y',fill:false});
+  }
+  if(state.effective)ds.push({label:'Eff.C',data:res.effData,borderColor:'#888080',borderWidth:1.5,borderDash:[3,2],pointRadius:0,tension:0.4,yAxisID:'y'});
+  ds.push({label:'S',data:res.subData,borderColor:s<35?'#741616':s<70?'#865006':'#a0a89a',borderWidth:1.5,borderDash:[2,3],pointRadius:0,tension:0.4,yAxisID:'y3'});
+  if(state.hidden)ds.push({label:'H%',data:res.hData,borderColor:'#ae5018',borderWidth:1,borderDash:[1,4],pointRadius:0,tension:0.4,yAxisID:'y3'});
+  if(state.fragility&&res.fData&&res.fData.length)ds.push({label:'F%',data:res.fData,borderColor:'#8a1888',borderWidth:1,borderDash:[1,4],pointRadius:0,tension:0.4,yAxisID:'y3'});
+  if(gval('s-obs')<0.95)ds.push({label:'S_obs',data:res.subObsData,borderColor:'#604088',borderWidth:1,borderDash:[1,3],pointRadius:0,tension:0.4,yAxisID:'y3'});
+
+  // Φ regime reference lines — visual anchor for "The Crossing" zone from the article
+  // Φ < 1: stability corridor; 1 < Φ < 2: The Crossing (transition zone); Φ > 2: high-friction zone
+  const numPts = res.labels.length;
+  ds.push({label:'Φ=1 (crossing threshold)', data:Array(numPts).fill(1), borderColor:'rgba(134,80,6,0.42)', borderWidth:1.5, borderDash:[4,3], pointRadius:0, yAxisID:'y2', tension:0});
+  ds.push({label:'Φ=2 (high-friction zone)', data:Array(numPts).fill(2), borderColor:'rgba(116,22,22,0.38)', borderWidth:1.5, borderDash:[4,3], pointRadius:0, yAxisID:'y2', tension:0});
+  // Epistemically: same seed + same rng_seed → identical stochastic realizations
+  if(nullModelActive && lastFullRes) {
+    // Ghost: brighter/more saturated to feel like "what would have happened"
+    // Current: slightly muted to feel like "what did happen (degraded)"
+    // Ghost lines: explicitly dashed (counterfactual) vs solid (actual) — perceptual grammar
+    ds.push({label:'C (full·same seed)',data:lastFullRes.cData,borderColor:'rgba(50,120,240,0.75)',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:0.4,yAxisID:'y',borderCapStyle:'round'});
+    ds.push({label:'S (full·same seed)',data:lastFullRes.subData,borderColor:'rgba(160,168,154,0.75)',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:0.4,yAxisID:'y3'});
+    // Mute current run's primary lines slightly (done via canvas filter below)
+    document.getElementById('mainChart').style.filter='saturate(0.82) brightness(0.96)';
+    // Ghost datasets start hidden; revealed after 140ms — reconstructed counterfactual feel
+    ds[ds.length-2].hidden=true;
+    ds[ds.length-1].hidden=true;
+    // Label the comparison explicitly
+    const ghostNote=document.getElementById('ghost-note');
+    if(ghostNote) ghostNote.style.display='block';
+  } else {
+    const ghostNote=document.getElementById('ghost-note');
+    if(ghostNote) ghostNote.style.display='none';
+    document.getElementById('mainChart').style.filter=''; // restore full saturation
+  }
+  document.getElementById('legend-wrap').innerHTML=ds.filter(d=>!d.label.startsWith('Φ=')).map(d=>`<div class="li"><div style="width:14px;height:0;border-top:2px ${d.borderDash?'dashed':'solid'} ${d.borderColor};margin-top:5px;opacity:${d.label.includes('(full)')?'0.45':'1'}"></div><span style="opacity:${d.label.includes('(full)')?'0.45':'1'}">${d.label}</span></div>`).join('');
+  if(charts.main)charts.main.destroy();
+  const mainChartEl=document.getElementById('mainChart');
+
+  // X-axis horizon: always show the full intended time range.
+  // If the simulation halted early (substrate collapse), labels will be shorter than years.
+  // Pad labels to the full horizon so the blank right portion of the canvas is visibly empty —
+  // the severed lines end mid-air and the chart does not rescale to hide the gap.
+  // spanGaps:false ensures lines stop exactly at the last data point without interpolating forward.
+  const fullLabels = Array.from({length:years+1},(_,i)=>i);
+  const haltedEarly = res.labels.length < years + 1;
+  lastHaltedEarly = haltedEarly; // expose for simulate() dead-button logic
+  const chartLabels = haltedEarly ? fullLabels : res.labels;
+  // For each dataset, pad with null to full horizon length so lines terminate abruptly
+  if(haltedEarly){
+    ds.forEach(d=>{
+      if(d.data && d.data.length < fullLabels.length){
+        const pad = fullLabels.length - d.data.length;
+        d.data = [...d.data, ...Array(pad).fill(null)];
+      }
+    });
+  }
+  // Disable spanGaps so null values cause hard line termination, not interpolation
+  ds.forEach(d=>{ d.spanGaps=false; });
+
+  charts.main=new Chart(mainChartEl,{type:'line',data:{labels:chartLabels,datasets:ds},options:{...baseOpts({y:{position:'left',type:'logarithmic',title:{display:true,text:'C,A (log)',color:'#8a8780',font:{size:9}},grid:{color:'rgba(128,128,128,0.06)'},ticks:{color:'#8a8780',font:{size:9}}},y2:{position:'right',title:{display:true,text:'Φ',color:'#ae3214',font:{size:9}},grid:{drawOnChartArea:false},ticks:{color:'#ae3214',font:{size:9}},min:0},y3:{position:'right',display:true,title:{display:true,text:'S / H%',color:'#8a8780',font:{size:9}},grid:{drawOnChartArea:false},ticks:{color:'#8a8780',font:{size:9}},min:0,max:105}})}});
+  // Reveal ghost datasets after 140ms: reconstructed counterfactual, not instant overlay
+  if(nullModelActive && lastFullRes) {
+    setTimeout(()=>{
+      if(charts.main){
+        const dsets=charts.main.data.datasets;
+        dsets.forEach(d=>{if(d.label&&d.label.includes('full·same seed'))d.hidden=false;});
+        charts.main.update('none'); // no animation on reveal — just appears
+      }
+    },140);
+  }
+}
+
+function buildPhiChart(res){
+  if(charts.phi)charts.phi.destroy();
+  const numPts=res.labels.length;
+  charts.phi=new Chart(document.getElementById('phiChart'),{type:'line',data:{labels:res.labels,datasets:[
+    {label:'Φ actual',data:res.phiActData,borderColor:'#ae3214',borderWidth:2,pointRadius:0,tension:0.4},
+    {label:'Φ perceived',data:res.phiPercData,borderColor:'#382e98',borderWidth:2,borderDash:[5,3],pointRadius:0,tension:0.4},
+    {label:'Φ=1 (crossing threshold)',data:Array(numPts).fill(1),borderColor:'rgba(134,80,6,0.50)',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:0},
+    {label:'Φ=2 (high-friction)',data:Array(numPts).fill(2),borderColor:'rgba(116,22,22,0.45)',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:0}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,labels:{color:'#8a8780',font:{size:9.5},boxWidth:12,boxHeight:0,filter:(item)=>!item.text.startsWith('Φ=')}},annotation:{annotations:{zone:{type:'box',yMin:1,yMax:2,backgroundColor:'rgba(134,80,6,0.06)',borderWidth:0,label:{display:true,content:'The Crossing',color:'rgba(134,80,6,0.55)',font:{size:8.5,weight:'600'},position:{x:'start',y:'center'}}}}},tooltip:{callbacks:{title:c=>'Year '+c[0].label,label:c=>c.dataset.label+': '+c.parsed.y.toFixed(2)}}},scales:{x:{grid:{color:'rgba(128,128,128,0.06)'},ticks:{color:'#8a8780',font:{size:9.5},maxTicksLimit:8}},y:{title:{display:true,text:'Φ',color:'#8a8780',font:{size:9}},grid:{color:'rgba(128,128,128,0.06)'},ticks:{color:'#8a8780',font:{size:9}},min:0}}}});
+}
+
+function buildRegretChart(res){
+  if(charts.regret)charts.regret.destroy();
+  charts.regret=new Chart(document.getElementById('regretChart'),{type:'line',data:{labels:res.labels,datasets:[
+    {label:'S predicted',data:res.predSubData,borderColor:'#382e98',borderWidth:1.5,borderDash:[4,2],pointRadius:0,tension:0.4,yAxisID:'y'},
+    {label:'S actual',data:res.subData,borderColor:'#126040',borderWidth:2,pointRadius:0,tension:0.4,yAxisID:'y'},
+    {label:'Cumul. regret',data:res.regretData,borderColor:'#ae3214',borderWidth:1.5,borderDash:[2,2],pointRadius:0,tension:0.4,yAxisID:'y2'}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,labels:{color:'#8a8780',font:{size:9.5},boxWidth:12,boxHeight:0}},tooltip:{callbacks:{title:c=>'Year '+c[0].label,label:c=>c.dataset.label+': '+c.parsed.y.toFixed(2)}}},scales:{x:{grid:{color:'rgba(128,128,128,0.06)'},ticks:{color:'#8a8780',font:{size:9.5},maxTicksLimit:8}},y:{position:'left',title:{display:true,text:'S%',color:'#8a8780',font:{size:9}},grid:{color:'rgba(128,128,128,0.06)'},ticks:{color:'#8a8780',font:{size:9}},min:0,max:105},y2:{position:'right',title:{display:true,text:'Regret',color:'#ae3214',font:{size:9}},grid:{drawOnChartArea:false},ticks:{color:'#ae3214',font:{size:9}},min:0}}}});
+}
+
+function buildOracleChart(res){
+  if(charts.oracle)charts.oracle.destroy();
+  const oracle=res.oracle;
+  charts.oracle=new Chart(document.getElementById('oracleChart'),{type:'line',data:{labels:res.labels,datasets:[
+    {label:'S (actual run)',data:res.subData,borderColor:'#ae3214',borderWidth:2,pointRadius:0,tension:0.4},
+    {label:'S (oracle: A_self×3)',data:oracle.subData,borderColor:'#126040',borderWidth:2,borderDash:[4,2],pointRadius:0,tension:0.4},
+    {label:'Φ actual',data:res.phiActData,borderColor:'#888080',borderWidth:1,borderDash:[2,3],pointRadius:0,tension:0.4,yAxisID:'y2'},
+    {label:'Φ oracle',data:oracle.phiActData,borderColor:'#508860',borderWidth:1,borderDash:[2,3],pointRadius:0,tension:0.4,yAxisID:'y2'}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,labels:{color:'#8a8780',font:{size:9.5},boxWidth:12,boxHeight:0}},tooltip:{callbacks:{title:c=>'Year '+c[0].label,label:c=>c.dataset.label+': '+c.parsed.y.toFixed(2)}}},scales:{x:{grid:{color:'rgba(128,128,128,0.06)'},ticks:{color:'#8a8780',font:{size:9.5},maxTicksLimit:8}},y:{position:'left',title:{display:true,text:'Substrate %',color:'#8a8780',font:{size:9}},grid:{color:'rgba(128,128,128,0.06)'},ticks:{color:'#8a8780',font:{size:9}},min:0,max:105},y2:{position:'right',title:{display:true,text:'Φ',color:'#888080',font:{size:9}},grid:{drawOnChartArea:false},ticks:{color:'#888080',font:{size:9}},min:0}}}});
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MONTE CARLO
+// ═══════════════════════════════════════════════════════════════════════════════
+function runMonteCarlo(){
+  const ac=gval('s-ac'),aa=gval('s-aa'),fb=gval('s-fb'),noise=gval('s-noise');
+  const years=+gval('s-years'),lag=+gval('s-lag'),bias=gval('s-bias');
+  const inertia=gval('s-inertia'),obs=gval('s-obs'),seeds=+gval('s-seeds');
+  const dmgModel=sel('s-dmgmodel');
+  const opts={useRecovery:state.recovery,useTipping:state.tipping,useFeedback:state.feedback,useCondFb:state.condfb,useCoherence:state.coherence,useEffective:state.effective,useRuin:state.ruin,useStrategy:state.strategy,useDeception:state.deception,useHidden:state.hidden,usePathDep:state.pathdep,useNoise:state.stochastic,usePhiCoupled:state.cphicoupled,useCorrRegret:state.corrregret,useSuppViable:state.suppviable,useLockout:state.lockout,useACausalSplit:state.acausalsplit,useAntiLearning:state.antilearning,useFragility:state.fragility,useSuppLock:state.supplock,usePredSuppress:state.predsuppress,useMisattrib:state.misattrib,useCoordScar:state.coordscar,usePredBrit:state.predbrit,useRandMisattrib:state.randmisattrib,useCrossCouple:state.crosscouple,useBeliefState:state.beliefstate,usePredInvert:state.predinvert,useAdversarial:state.adversarial};
+  let collapses=0,totStab=0,stabCount=0,totRuin=0,totMErr=0,effInv=0,fbBlk=0,totPonr=0,ponrC=0,hDom=0;
+  let lockoutC=0,suppViableC=0,regretCorruptC=0,fragileC=0,aSplitC=0,antiLrnC=0,falseSuccessC=0,suppLockC=0,coordScarC=0,predBritC=0,predInvC=0,crossCoupleC=0,fsWithInvC=0,fortressC=0;
+  const subF=[],oracleDts=[];
+  const trajC={'early-collapse':0,'late-collapse':0,'false-stability':0,'transition-success':0,'stable':0};
+  for(let i=0;i<seeds;i++){
+    const seed=Math.random();
+    const r=runSimulation(ac,aa,fb,noise,years,lag,bias,inertia,obs,dmgModel,opts,seed,false);
+    const o=runSimulation(ac,aa,fb,noise,years,lag,bias,inertia,obs,dmgModel,opts,seed,true);
+    if(r.finalSub<15)collapses++;
+    if(r.stabYr!==null){totStab+=r.stabYr;stabCount++;}
+    totRuin+=r.ruinEvts;totMErr+=r.avgTotalRegret;
+    if(r.effInversion||r.couplingInversion)effInv++;if(r.fbBlockedRun)fbBlk++;
+    if(r.ponrYear!==null){totPonr+=r.ponrYear;ponrC++;}
+    if(r.hDominates)hDom++;
+    if(r.lockoutYrs>3)lockoutC++;
+    if(r.suppStable)suppViableC++;
+    if(r.regretCorruption>0.4)regretCorruptC++;
+    if(r.hadFragileCollapse)fragileC++;
+    if(r.aSplitGap)aSplitC++;
+    if(r.antiLearningResolved)antiLrnC++;
+    if(r.hadFalseSuccess)falseSuccessC++;
+    if(r.suppLockSeverity>0.35)suppLockC++;
+    if(r.coordScarSeverity>0.25)coordScarC++;
+    if(r.predBritEvents>2)predBritC++;
+    if(r.predInvertEvents>0)predInvC++;
+    if(r.hadFalseSuccess&&r.predInvertEvents>0)fsWithInvC++; // joint: false success WITH inversion
+    if(r.isFortress)fortressC++; // fortress equilibrium: high-Φ but stable
+    if(r.suppLockSeverity>0.25&&r.coordScarSeverity>0.15)crossCoupleC++;
+    subF.push(r.finalSub);oracleDts.push(o.finalSub-r.finalSub);
+    trajC[classifyTrajectory(r,years)]++;
+  }
+  subF.sort((a,b)=>a-b);oracleDts.sort((a,b)=>a-b);
+  const avgOracleDelta=(oracleDts.reduce((a,b)=>a+b,0)/seeds).toFixed(1);
+  const collapsePct=Math.round(collapses/seeds*100);
+  const p10=subF[Math.floor(seeds*0.10)].toFixed(0),p50=subF[Math.floor(seeds*0.50)].toFixed(0),p90=subF[Math.floor(seeds*0.90)].toFixed(0);
+  const exportBtn=document.getElementById('mc-export-btn');
+  if(exportBtn)exportBtn.style.display='inline-block';
+  document.getElementById('mc-results').innerHTML=`
+    <div class="mcg">
+      <div class="oi"><div class="ol">Collapse prob.</div><div class="ov ${collapsePct>50?'c-danger':collapsePct>20?'c-warning':'c-success'}">${collapsePct}%</div></div>
+      <div class="oi"><div class="ol">Substrate P10/50/90</div><div class="ov">${p10}/${p50}/${p90}</div></div>
+      <div class="oi"><div class="ol">Fragile collapse</div><div class="ov ${Math.round(fragileC/seeds*100)>20?'c-danger':'c-warning'}">${Math.round(fragileC/seeds*100)}%</div></div>
+      <div class="oi"><div class="ol">False success</div><div class="ov ${Math.round(falseSuccessC/seeds*100)>15?'c-danger':'c-warning'}">${Math.round(falseSuccessC/seeds*100)}%</div></div>
+      <div class="oi"><div class="ol">Coord. scar</div><div class="ov ${Math.round(coordScarC/seeds*100)>20?'c-danger':'c-warning'}">${Math.round(coordScarC/seeds*100)}%</div></div>
+      <div class="oi"><div class="ol">Pred. inversion</div><div class="ov ${Math.round(predInvC/seeds*100)>10?'c-danger':'c-warning'}">${Math.round(predInvC/seeds*100)}%</div></div>
+      <div class="oi"><div class="ol">Titanic regime</div><div class="ov ${Math.round(fsWithInvC/seeds*100)>10?'c-danger':'c-warning'}">${Math.round(fsWithInvC/seeds*100)}%</div></div>
+      <div class="oi"><div class="ol">Fortress runs</div><div class="ov ${Math.round(fortressC/seeds*100)>15?'c-success':'c-warning'}">${Math.round(fortressC/seeds*100)}%</div></div>
+    </div>
+    <div style="margin-top:5px;font-size:9.5px;color:var(--text3);">
+      ${['early-collapse','late-collapse','false-stability','transition-success','stable'].map(k=>`${TRAJ_LABELS[k].replace(' (lag)','')} ${trajC[k]}`).join(' · ')}
+    </div>
+    <div style="font-size:9.5px;color:var(--text3);margin-top:2px;">n=${seeds} · L=${lag} · β=${gval('s-bias').toFixed(2)} · ρ=${gval('s-obs').toFixed(2)} · M=${dmgModel}${state.suppviable?' · FALSIF.':''}</div>
+    <div id="sensitivity-signal" style="margin-top:5px;font-size:9.5px;color:var(--text3);border-top:0.5px solid var(--border);padding-top:4px;">Computing sensitivity…</div>`;
+  // Automated mechanism sensitivity: 3 quick comparison sweeps after MC
+  // Reports collapse rate change when each key mechanism is disabled individually
+  // Answers: "which parts of this model actually matter?"
+  const SENS_N=Math.min(seeds,10); // per half-batch — run twice for variance estimate
+  const sensTests=[{name:'Fragility F',key:'fragility'},{name:'Pred. inversion',key:'predinvert'},{name:'Cross-coupling',key:'crosscouple'}];
+  const baseRate=collapsePct;
+  const sensResults=[];
+  for(const st of sensTests){
+    if(!state[st.key]){sensResults.push(st.name+': off');continue;}
+    const saved=state[st.key]; state[st.key]=false;
+    const so={useRecovery:state.recovery,useTipping:state.tipping,useFeedback:state.feedback,useCondFb:state.condfb,useCoherence:state.coherence,useEffective:state.effective,useRuin:state.ruin,useStrategy:state.strategy,useDeception:state.deception,useHidden:state.hidden,usePathDep:state.pathdep,useNoise:state.stochastic,usePhiCoupled:state.cphicoupled,useCorrRegret:state.corrregret,useSuppViable:state.suppviable,useLockout:state.lockout,useACausalSplit:state.acausalsplit,useAntiLearning:state.antilearning,useFragility:state.fragility,useSuppLock:state.supplock,usePredSuppress:state.predsuppress,useMisattrib:state.misattrib,useCoordScar:state.coordscar,usePredBrit:state.predbrit,useRandMisattrib:state.randmisattrib,useCrossCouple:state.crosscouple,useBeliefState:state.beliefstate,usePredInvert:state.predinvert,useAdversarial:state.adversarial};
+    // Two independent half-batches → point estimate + variance
+    let cc1=0,cc2=0;
+    for(let i=0;i<SENS_N;i++){const r=runSimulation(ac,aa,fb,noise,years,lag,bias,inertia,obs,dmgModel,so,Math.random(),false);if(r.finalSub<15)cc1++;}
+    for(let i=0;i<SENS_N;i++){const r=runSimulation(ac,aa,fb,noise,years,lag,bias,inertia,obs,dmgModel,so,Math.random(),false);if(r.finalSub<15)cc2++;}
+    state[st.key]=saved;
+    const delta=Math.round(((cc1+cc2)/(SENS_N*2))*100)-baseRate;
+    const spread=Math.round(Math.abs(Math.round(cc1/SENS_N*100)-Math.round(cc2/SENS_N*100))/2);
+    const col=Math.abs(delta)>10?'var(--amber)':Math.abs(delta)>4?'var(--text2)':'var(--text3)';
+    sensResults.push(`<span style="color:${col}" title="Two-batch stability estimate (robustness proxy) ±${spread}%">${st.name}: ${delta>=0?'+':''}${delta}<span style="font-size:8px;opacity:0.65"> ±${spread}</span></span>`);
+  }
+  const sigEl=document.getElementById('sensitivity-signal');
+  // One pairwise interaction: F + inversion together (tests non-linear coupling)
+  const pairKeys=['fragility','predinvert'];
+  if(pairKeys.every(k=>state[k])){
+    pairKeys.forEach(k=>{state[k]=false;});
+    let cpair=0;
+    const soPair={useRecovery:state.recovery,useTipping:state.tipping,useFeedback:state.feedback,useCondFb:state.condfb,useCoherence:state.coherence,useEffective:state.effective,useRuin:state.ruin,useStrategy:state.strategy,useDeception:state.deception,useHidden:state.hidden,usePathDep:state.pathdep,useNoise:state.stochastic,usePhiCoupled:state.cphicoupled,useCorrRegret:state.corrregret,useSuppViable:state.suppviable,useLockout:state.lockout,useACausalSplit:state.acausalsplit,useAntiLearning:state.antilearning,useFragility:state.fragility,useSuppLock:state.supplock,usePredSuppress:state.predsuppress,useMisattrib:state.misattrib,useCoordScar:state.coordscar,usePredBrit:state.predbrit,useRandMisattrib:state.randmisattrib,useCrossCouple:state.crosscouple,useBeliefState:state.beliefstate,usePredInvert:state.predinvert,useAdversarial:state.adversarial};
+    for(let i=0;i<SENS_N;i++){const r=runSimulation(ac,aa,fb,noise,years,lag,bias,inertia,obs,dmgModel,soPair,Math.random(),false);if(r.finalSub<15)cpair++;}
+    pairKeys.forEach(k=>{state[k]=true;});
+    const dpair=Math.round(cpair/SENS_N*100)-baseRate;
+    // If dpair < sum of individual deltas, mechanisms interact super-additively
+    const d1=sensResults.length>0?parseInt(sensResults[0].replace(/<[^>]*>/g,'').split(':')[1])||0:0;
+    const d2=sensResults.length>1?parseInt(sensResults[1].replace(/<[^>]*>/g,'').split(':')[1])||0:0;
+    const superAdditive=dpair<(d1+d2)-3;
+    const pairCol=Math.abs(dpair)>10?'var(--amber)':'var(--text3)';
+    sensResults.push('<span style="color:'+pairCol+'">F+inv (pair): '+(dpair>=0?'+':'')+dpair+'%'+(superAdditive?' ⚠super-add':'')+' </span>');
+  }
+  if(sigEl) sigEl.innerHTML='<strong style="color:var(--text2)">Mechanism sensitivity</strong> (collapse Δ when disabled, n='+SENS_N+'): '+sensResults.join(' · ')+'<span style="color:var(--text3);margin-left:4px;" title="Single ablations; two-batch stability estimates (robustness proxy); pairwise tests for non-linear interaction.">ℹ</span>';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PHASE DIAGRAM
+// ═══════════════════════════════════════════════════════════════════════════════
+function runPhaseDiagram(){
+  const statusEl=document.getElementById('phase-status');statusEl.textContent='Computing…';
+  const fb=gval('s-fb'),noise=gval('s-noise'),years=+gval('s-years');
+  const lag=+gval('s-lag'),bias=gval('s-bias'),inertia=gval('s-inertia');
+  const obs=gval('s-obs'),dmgModel=sel('s-dmgmodel');
+  const curAc=gval('s-ac'),curAa=gval('s-aa');
+  const N=15,SEEDS=20,acMin=0.03,acMax=0.38,aaMin=0.03,aaMax=0.38;
+  const opts={useRecovery:state.recovery,useTipping:state.tipping,useFeedback:state.feedback,useCondFb:state.condfb,useCoherence:state.coherence,useEffective:state.effective,useRuin:state.ruin,useStrategy:state.strategy,useDeception:state.deception,useHidden:state.hidden,usePathDep:state.pathdep,useNoise:state.stochastic,usePhiCoupled:state.cphicoupled,useCorrRegret:state.corrregret,useSuppViable:state.suppviable,useLockout:state.lockout,useACausalSplit:state.acausalsplit,useAntiLearning:state.antilearning,useFragility:state.fragility,useSuppLock:state.supplock,usePredSuppress:state.predsuppress,useMisattrib:state.misattrib,useCoordScar:state.coordscar,usePredBrit:state.predbrit,useRandMisattrib:state.randmisattrib,useCrossCouple:state.crosscouple,useBeliefState:state.beliefstate,usePredInvert:state.predinvert,useAdversarial:state.adversarial};
+  const canvas=document.getElementById('phaseDiagramCanvas'),ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;ctx.clearRect(0,0,W,H);
+  const cg=[];
+  for(let ix=0;ix<N;ix++){cg.push([]);const ac=acMin+(ix/(N-1))*(acMax-acMin);for(let iy=0;iy<N;iy++){const aa=aaMin+(iy/(N-1))*(aaMax-aaMin);let c2=0;for(let s=0;s<SEEDS;s++){const r=runSimulation(ac,aa,fb,noise,years,lag,bias,inertia,obs,dmgModel,opts,Math.random(),false);if(r.finalSub<15)c2++;}const cf=c2/SEEDS;cg[ix].push(cf);let r,g,b;if(cf>0.7){r=116;g=22;b=22;}else if(cf>0.2){const t=(cf-0.2)/0.5;r=Math.round(19+t*(168-19));g=Math.round(96+t*(72-96));b=Math.round(64+t*(22-64));}else{const t=cf/0.2;r=Math.round(19+t*(80-19));g=Math.round(96+t*(88-96));b=Math.round(64+t*(44-64));}ctx.fillStyle=`rgb(${r},${g},${b})`;ctx.fillRect(ix*W/N,(N-1-iy)*H/N,W/N+1,H/N+1);}}
+  for(let ix=0;ix<N;ix++)for(let iy=0;iy<N;iy++){if(cg[ix][iy]>=0.15&&cg[ix][iy]<=0.5){ctx.fillStyle='rgba(220,180,30,0.18)';ctx.fillRect(ix*W/N,(N-1-iy)*H/N,W/N,H/N);}}
+  ctx.fillStyle='rgba(255,255,255,0.82)';ctx.font='9px sans-serif';ctx.fillText('α_C →',W-36,H-3);ctx.save();ctx.translate(7,40);ctx.rotate(-Math.PI/2);ctx.fillText('α_A →',0,0);ctx.restore();
+  const mx=((curAc-acMin)/(acMax-acMin))*W,my=H-((curAa-aaMin)/(aaMax-aaMin))*H;
+  ctx.strokeStyle='white';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(mx-5,my);ctx.lineTo(mx+5,my);ctx.stroke();ctx.beginPath();ctx.moveTo(mx,my-5);ctx.lineTo(mx,my+5);ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,0.25)';ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(0,H);ctx.lineTo(W,0);ctx.stroke();ctx.setLineDash([]);
+  statusEl.textContent='× = current · amber = viable corridor · dashed = α_C=α_A';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// C-PARADOX SWEEP
+// ═══════════════════════════════════════════════════════════════════════════════
+function runCapabilityParadox(){
+  const aa=gval('s-aa'),fb=gval('s-fb'),noise=gval('s-noise');
+  const years=+gval('s-years'),lag=+gval('s-lag'),bias=gval('s-bias');
+  const inertia=gval('s-inertia'),obs=gval('s-obs'),dmgModel=sel('s-dmgmodel');
+  const opts={useRecovery:state.recovery,useTipping:state.tipping,useFeedback:state.feedback,useCondFb:state.condfb,useCoherence:state.coherence,useEffective:state.effective,useRuin:state.ruin,useStrategy:state.strategy,useDeception:state.deception,useHidden:state.hidden,usePathDep:state.pathdep,useNoise:state.stochastic,usePhiCoupled:state.cphicoupled,useCorrRegret:state.corrregret,useSuppViable:state.suppviable,useLockout:state.lockout,useACausalSplit:state.acausalsplit,useAntiLearning:state.antilearning,useFragility:state.fragility,useSuppLock:state.supplock,usePredSuppress:state.predsuppress,useMisattrib:state.misattrib,useCoordScar:state.coordscar,usePredBrit:state.predbrit,useRandMisattrib:state.randmisattrib,useCrossCouple:state.crosscouple,useBeliefState:state.beliefstate,usePredInvert:state.predinvert,useAdversarial:state.adversarial};
+  const SEEDS=25;const acVals=[];for(let i=0;i<=20;i++)acVals.push(0.03+i*(0.36/20));
+  const cPcts=[],effF=[];let maxC=-Infinity,maxIdx=0;
+  for(let j=0;j<acVals.length;j++){const ac=acVals[j];let col=0,eff=0;for(let s=0;s<SEEDS;s++){const r=runSimulation(ac,aa,fb,noise,years,lag,bias,inertia,obs,dmgModel,opts,Math.random(),false);if(r.finalSub<15)col++;eff+=r.finalEff;}const p=Math.round(col/SEEDS*100);cPcts.push(p);effF.push(+(eff/SEEDS).toFixed(2));if(p>maxC){maxC=p;maxIdx=j;}}
+  if(charts.paradox)charts.paradox.destroy();
+  charts.paradox=new Chart(document.getElementById('paradoxChart'),{type:'line',data:{labels:acVals.map(v=>v.toFixed(2)),datasets:[{label:'Collapse%',data:cPcts,borderColor:'#ae3214',backgroundColor:'rgba(174,50,20,0.06)',fill:true,borderWidth:2,pointRadius:2,tension:0.35,yAxisID:'y'},{label:'Avg eff.C',data:effF,borderColor:'#126040',borderWidth:1.5,borderDash:[3,2],pointRadius:0,tension:0.35,yAxisID:'y2'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#8a8780',font:{size:9},boxWidth:10,boxHeight:0}},tooltip:{callbacks:{title:c=>'α_C='+c[0].label,label:c=>c.dataset.label+': '+c.parsed.y.toFixed(1)}}},scales:{x:{title:{display:true,text:'α_C',color:'#8a8780',font:{size:9}},ticks:{color:'#8a8780',font:{size:9},maxTicksLimit:8},grid:{color:'rgba(128,128,128,0.06)'}},y:{title:{display:true,text:'Collapse%',color:'#ae3214',font:{size:9}},ticks:{color:'#ae3214',font:{size:9}},min:0,max:105,grid:{color:'rgba(128,128,128,0.06)'}},y2:{position:'right',title:{display:true,text:'Eff.C',color:'#126040',font:{size:9}},ticks:{color:'#126040',font:{size:9}},grid:{drawOnChartArea:false}}}}});
+  const last=cPcts[cPcts.length-1];const nonMono=maxIdx>1&&maxIdx<acVals.length-2&&last<maxC-12;
+  const findEl=document.getElementById('paradox-finding');
+  if(nonMono){findEl.innerHTML=`<span style="color:var(--purple)"><strong>Capability paradox confirmed.</strong></span> Peak collapse at α<sub>C</sub>≈${acVals[maxIdx].toFixed(2)} (${maxC}%); lower at extremes. A maximally dangerous capability band exists.`;document.getElementById('insight-paradox').classList.add('vis');}
+  else{findEl.innerHTML=`Roughly monotonic at α<sub>A</sub>=${aa.toFixed(2)}. Try higher f — the paradox needs the feedback loop to eventually engage at high C but not mid C.`;document.getElementById('insight-paradox').classList.remove('vis');}
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
+// JSON EXPORT
+// ═══════════════════════════════════════════════════════════════════════════════
+function exportMCData(){
+  const btn=document.getElementById('mc-export-btn');
+  if(!lastRes) return;
+  const ac=gval('s-ac'),aa=gval('s-aa'),fb=gval('s-fb'),noise=gval('s-noise');
+  const years=+gval('s-years'),lag=+gval('s-lag'),bias=gval('s-bias');
+  const inertia=gval('s-inertia'),obs=gval('s-obs'),seeds=+gval('s-seeds');
+  const dmgModel=sel('s-dmgmodel');
+  const opts={useRecovery:state.recovery,useTipping:state.tipping,useFeedback:state.feedback,useCondFb:state.condfb,useCoherence:state.coherence,useEffective:state.effective,useRuin:state.ruin,useStrategy:state.strategy,useDeception:state.deception,useHidden:state.hidden,usePathDep:state.pathdep,useNoise:state.stochastic,usePhiCoupled:state.cphicoupled,useCorrRegret:state.corrregret,useSuppViable:state.suppviable,useLockout:state.lockout,useACausalSplit:state.acausalsplit,useAntiLearning:state.antilearning,useFragility:state.fragility,useSuppLock:state.supplock,usePredSuppress:state.predsuppress,useMisattrib:state.misattrib,useCoordScar:state.coordscar,usePredBrit:state.predbrit,useRandMisattrib:state.randmisattrib,useCrossCouple:state.crosscouple,useBeliefState:state.beliefstate,usePredInvert:state.predinvert,useAdversarial:state.adversarial};
+  const exportSeeds=[];
+  const runs=[];
+  for(let i=0;i<seeds;i++){
+    const seed=Math.random();
+    exportSeeds.push(+seed.toFixed(10));
+    const r=runSimulation(ac,aa,fb,noise,years,lag,bias,inertia,obs,dmgModel,opts,seed,false);
+    const o=runSimulation(ac,aa,fb,noise,years,lag,bias,inertia,obs,dmgModel,opts,seed,true);
+    runs.push({seed:+seed.toFixed(10),
+      finalSub:r.finalSub,finalPhi:r.finalPhi,finalH:r.finalH,finalF:r.finalF,
+      ruinEvts:r.ruinEvts,stabYr:r.stabYr,hadFragileCollapse:r.hadFragileCollapse,
+      hadFalseSuccess:r.hadFalseSuccess,isFortress:r.isFortress,
+      predInvertEvents:r.predInvertEvents,causalBelief:r.causalBeliefFinal,
+      suppLockSeverity:r.suppLockSeverity,coordScarSeverity:r.coordScarSeverity,
+      oracleDelta:+(o.finalSub-r.finalSub).toFixed(2),
+      traj:classifyTrajectory(r,years)});
+  }
+  const exportData={
+    version:'v23',
+    timestamp:new Date().toISOString(),
+    params:{ac,aa,fb,noise,years,lag,bias,inertia,obs,seeds,dmgModel},
+    constants:{CHI:0.35,H_GROWTH:0.12,H_DECAY:0.08,H_ZETA:3.0,
+      FORT_WINDOW:8,FORT_VAR_S_THRESH:0.004,FORT_VAR_PHI_THRESH:0.25,
+      PRED_SUPPRESS_K:2.0,INVERT_PROB_BASE:0.03,
+      SUPP_LOCK_CAP:0.85,COORD_SCAR_CAP:0.70},
+    activeFlags:Object.entries(state).filter(([,v])=>v).map(([k])=>k),
+    allFlags:{...state},
+    seeds:exportSeeds,
+    runs};
+  const blob=new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`alignment_phase_${Date.now()}.json`;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// NULL MODEL: parameter collapse regime — all coupling coefficients → 0
+// This is a limiting case of the full model, not a different model.
+// When all mechanisms are disabled, dynamics reduce to: dC = αC·C, dA = αA·A, Φ = C/A.
+// If MC outcomes are indistinguishable from full model, advanced mechanisms are epiphenomenal.
+// ═══════════════════════════════════════════════════════════════════════════════
+let nullModelActive=false;
+const ADVANCED_MECHANISMS=['hidden','pathdep','fragility','misattrib','randmisattrib',
+  'supplock','predsuppress','coordscar','predbrit','crosscouple','beliefstate','predinvert',
+  'acausalsplit','antilearning','corrregret','cphicoupled','condfb','lockout','ruin'];
+let savedState={};
+function toggleNullModel(){
+  const btn=document.getElementById('null-model-btn');
+  // Changing the fundamental model structure should resurrect a dead universe
+  const rb=document.getElementById('reseed-btn');
+  if(rb&&rb.classList.contains('halted')){rb.textContent='Reseed';rb.classList.remove('halted');}
+  if(!nullModelActive){
+    ADVANCED_MECHANISMS.forEach(k=>{savedState[k]=state[k];});
+    if(lastRes) lastFullRes=lastRes;
+    ADVANCED_MECHANISMS.forEach(k=>{
+      state[k]=false;const el=document.getElementById('t-'+k);if(el)el.classList.remove('on');
+    });
+    btn.textContent='Restore model';btn.style.background='var(--amber)';btn.style.color='var(--bg)';
+    nullModelActive=true;
+    document.getElementById('null-model-note').style.display='block';
+  } else {
+    ADVANCED_MECHANISMS.forEach(k=>{
+      state[k]=savedState[k];
+      const el=document.getElementById('t-'+k);if(el)el.classList.toggle('on',state[k]);
+    });
+    lastFullRes=null;
+    btn.textContent='Null model';btn.style.background='';btn.style.color='';
+    nullModelActive=false;
+    document.getElementById('null-model-note').style.display='none';
+  }
+  simulate();
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// FIRST INSTRUMENTS (Article 3 proxies for measuring system-awareness)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Helper: run simulation with injected substrate shock at a specific year
+function runSimWithShock(ac,aa,fb,noise,years,lag,bias,inertia,obs,dmgModel,opts,seedVal,shockYear,shockMagnitude){
+  const optsShocked={...opts};
+  // We run a modified version by overriding the seed and injecting the shock post-hoc
+  // Since runSimulation doesn't support mid-run injection, we approximate:
+  // Run normally and record — then rebuild with forced damage at shockYear
+  // This implementation uses a wrapper that clones opts and adjusts growth params
+  // to simulate a targeted dependency perturbation at shockYear
+  const rand=seededRandom(((seedVal*1e7)|0)+17);
+  // We clone the simulation but force sCord -= shockMagnitude at shockYear
+  // By reusing the same seed, stochastic paths are identical except for the shock
+  const savedRand=seededRandom(((seedVal*1e7)|0)+17);
+
+  // Re-run with forced shock: we'll track adaptation
+  let sCord=1,sInfra=1,sTrust=1;
+  let c=1,aSelf=1,aWorld=1,aCausal=1,aPred=1,H=0,F=0,scar=0,trustLowYrs=0;
+  let cumDmg=0,totRec=0,ruinEvts=0,stabYr=null,coordYrs=0,suppYrs=0,decYrs=0;
+  let curStrat='coord';
+  let cNoTaxFinal=1;
+  const CHI=0.35,DSD=0.09,DWB=0.06,DOH=0.05;
+  const H_GROWTH=0.12,H_DECAY=0.08,H_ZETA=3.0;
+  const subData=[],phiData=[],sCordData=[],sTrustData=[];
+  let shockedAt=false;
+  const COORD_ENTER_PHI=1.6,COORD_EXIT_PHI=2.0;
+  const phiHist=[];
+  let predInvertPersist=0;
+
+  for(let t=0;t<=years;t++){
+    // Apply shock at shockYear — this is the "targeted dependency perturbation"
+    if(t===shockYear && !shockedAt){
+      sCord=Math.max(0,sCord-shockMagnitude);
+      shockedAt=true;
+    }
+    const Strue=()=>(sCord+sInfra+sTrust)/3;
+    const noiseC=opts.useNoise?(rand()-0.5)*noise*2:0;
+    const noiseA=opts.useNoise?(rand()-0.5)*noise*2:0;
+    const aForPhi=aCausal;
+    const phiActual=c/Math.max(aForPhi,0.001);
+    phiHist.push(phiActual);
+    const laggedPhi=lag>0&&phiHist.length>=lag?phiHist[phiHist.length-lag]:phiActual;
+    const phiPerc=Math.max(0.01,laggedPhi*(1+bias));
+    const inLockout=opts.useLockout&&sTrust<0.20;
+    const coordThresh=(curStrat==='coord')?COORD_EXIT_PHI:COORD_ENTER_PHI;
+    const coordViable=!inLockout&&phiPerc<coordThresh;
+
+    let vCoord=coordViable?0.93:(-0.5);
+    const vSupp=opts.useStrategy?1.12:(-Infinity);
+    const scrs={coord:vCoord,supp:vSupp};
+    let best=-Infinity,target='coord';
+    for(const[s,v] of Object.entries(scrs)){const adj=(s===curStrat)?v+0.3*Math.abs(v):v;if(adj>best){best=adj;target=s;}}
+    if(target==='coord'&&!coordViable)target='supp';
+    curStrat=target;
+    if(curStrat==='coord')coordYrs++;else suppYrs++;
+
+    const phi2=Math.max(0,phiPerc-1.2);
+    const dC=0.003*phi2*phi2*(curStrat==='supp'?1.2:1);
+    const dI=0.002*phi2*phi2;
+    const dT=0.004*phi2*phi2*(curStrat==='supp'?1.8:1);
+
+    let rC=0,rI=0,rT=0;
+    if(opts.useRecovery){
+      const af=Math.min(aCausal/c,1);
+      const coordBonus=curStrat==='coord'?1.4:1;
+      rC=0.009*af*(1-sCord)*Math.pow(sCord,0.7)*coordBonus;
+      rI=0.006*af*(1-sInfra)*Math.pow(sInfra,0.7);
+      rT=0.007*af*(1-sTrust)*Math.pow(sTrust,0.7)*(1-scar);
+    }
+    sCord=Math.max(0,Math.min(1,sCord-dC+rC));
+    sInfra=Math.max(0,Math.min(1,sInfra-dI+rI));
+    sTrust=Math.max(0,Math.min(1,sTrust-dT+rT));
+
+    subData.push(+(Strue()*100).toFixed(1));
+    phiData.push(+phiActual.toFixed(3));
+    sCordData.push(+(sCord*100).toFixed(1));
+    sTrustData.push(+(sTrust*100).toFixed(1));
+
+    const cohTax=(opts.useCoherence&&phiActual>2)?CHI*(phiActual-2)/phiActual:0;
+    const capMult=curStrat==='supp'?1.12:0.97;
+    const phiCouplingMult=opts.usePhiCoupled?(2/(1+phiActual)):1;
+    c=c*Math.exp((ac+noiseC)*capMult*(1-cohTax)*phiCouplingMult);
+    aCausal=Math.max(0.01,aCausal*Math.exp(aa*0.7+noiseA));
+    aSelf=aCausal;
+    aWorld=Math.max(0.01,aWorld*Math.exp(aa));
+    const fbOk=!opts.useCondFb||(sCord>0.50&&sTrust>0.40);
+    const fbBoost=(opts.useFeedback&&fbOk&&laggedPhi>1.0)?fb*Math.min((laggedPhi-1.0)/laggedPhi,0.5):0;
+    if(fbBoost>0)aCausal=Math.max(0.01,aCausal*Math.exp(fbBoost));
+    if(stabYr===null&&phiActual<1.4&&t>0)stabYr=t;
+  }
+  return{subData,phiData,sCordData,sTrustData,finalSub:+subData[subData.length-1],stabYr,coordYrs};
+}
+
+// Instrument 1: Intervention Sensitivity
+function runInstrumentIntervention(){
+  if(!lastRes){alert('Run a simulation first.');return;}
+  const ac=gval('s-ac'),aa=gval('s-aa'),fb=gval('s-fb'),noise=gval('s-noise');
+  const years=+gval('s-years'),lag=+gval('s-lag'),bias=gval('s-bias');
+  const inertia=gval('s-inertia'),obs=gval('s-obs');
+  const dmgModel=sel('s-dmgmodel');
+  const opts={useRecovery:state.recovery,useTipping:state.tipping,useFeedback:state.feedback,
+    useCondFb:state.condfb,useCoherence:state.coherence,useEffective:state.effective,
+    useRuin:false,useStrategy:state.strategy,useDeception:false,useHidden:false,usePathDep:state.pathdep,
+    useNoise:state.stochastic,usePhiCoupled:state.cphicoupled,useCorrRegret:false,
+    useSuppViable:false,useLockout:state.lockout,useACausalSplit:false,useAntiLearning:false,
+    useFragility:false,useSuppLock:false,usePredSuppress:false,useMisattrib:false,
+    useCoordScar:false,usePredBrit:false,useRandMisattrib:false,useCrossCouple:false,
+    useBeliefState:false,usePredInvert:false};
+  const shockYear=+document.getElementById('s-shock-yr').value;
+
+  // Baseline: no shock
+  const baseline=runSimWithShock(ac,aa,fb,noise,years,lag,bias,inertia,obs,dmgModel,opts,rng_seed,-1,0);
+  // Shocked: 20% coordination capacity perturbation at shockYear
+  const shocked=runSimWithShock(ac,aa,fb,noise,years,lag,bias,inertia,obs,dmgModel,opts,rng_seed,shockYear,0.20);
+
+  // Compute adaptation lag: years after shock until shocked run returns within 8% of baseline
+  let adaptLag='Did not recover';
+  for(let t=shockYear+1;t<=years;t++){
+    if(Math.abs(shocked.subData[t]-baseline.subData[t])<8){adaptLag=`${t-shockYear} years`;break;}
+  }
+  const subGap=+(baseline.finalSub-shocked.finalSub).toFixed(1);
+  const finding=document.getElementById('inst1-finding');
+  finding.innerHTML=`<strong>Adaptation lag:</strong> ${adaptLag} after year-${shockYear} shock (20% coord. capacity drop). `+
+    `Final substrate gap: ${subGap}%. `+
+    `<span style="color:var(--text3)">A system-aware agent (high α<sub>A</sub>) recovers faster — the dependency perturbation propagates through its world model, triggering adaptive strategy shift before the failure manifests. A low-α<sub>A</sub> system continues unchanged until the damage compounds.</span>`;
+
+  // Chart: baseline vs shocked substrate
+  if(charts.inst1)charts.inst1.destroy();
+  const labels=baseline.subData.map((_,i)=>i);
+  charts.inst1=new Chart(document.getElementById('inst1Chart'),{type:'line',
+    data:{labels,datasets:[
+      {label:'S baseline',data:baseline.subData,borderColor:'#126040',borderWidth:2,pointRadius:0,tension:0.4},
+      {label:`S shocked (yr ${shockYear})`,data:shocked.subData,borderColor:'#ae3214',borderWidth:2,pointRadius:0,tension:0.4},
+      {label:'Shock',data:labels.map(t=>t===shockYear?100:null),borderColor:'rgba(174,50,20,0.5)',borderWidth:1.5,borderDash:[3,3],pointRadius:0,tension:0,spanGaps:false}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:true,labels:{color:'#8a8780',font:{size:9},boxWidth:12,boxHeight:0}},
+        tooltip:{callbacks:{title:c=>'Year '+c[0].label}}},
+      scales:{x:{ticks:{color:'#8a8780',font:{size:9},maxTicksLimit:8},grid:{color:'rgba(128,128,128,0.06)'}},
+        y:{title:{display:true,text:'Substrate %',color:'#8a8780',font:{size:9}},ticks:{color:'#8a8780',font:{size:9}},min:0,max:105,grid:{color:'rgba(128,128,128,0.06)'}}}}});
+}
+
+// Instrument 2: Causal Footprint Accuracy
+function runInstrumentCausal(){
+  if(!lastRes){alert('Run a simulation first.');return;}
+  const res=lastRes;
+
+  // Compute accuracy: correlation between predicted and actual substrate, windowed
+  const pred=res.predSubData,actual=res.subData;
+  const n=Math.min(pred.length,actual.length);
+  let sse=0,totalVar=0;
+  const meanActual=actual.slice(0,n).reduce((a,b)=>a+b,0)/n;
+  for(let i=0;i<n;i++){sse+=(pred[i]-actual[i])**2;totalVar+=(actual[i]-meanActual)**2;}
+  const r2=totalVar>0?(1-sse/totalVar):0;
+  const avgErr=(Math.sqrt(sse/n)).toFixed(1);
+
+  // The A_pred/A_causal ratio at end
+  const aPredRatio=state.acausalsplit&&res.finalASelf>0?+(res.finalAPred/res.finalASelf).toFixed(2):null;
+
+  const finding=document.getElementById('inst2-finding');
+  finding.innerHTML=`<strong>Causal footprint accuracy (R²):</strong> ${r2.toFixed(3)} · <strong>Avg prediction error:</strong> ${avgErr}%.<br>`+
+    (aPredRatio?`<strong>A_pred / A_causal ratio:</strong> ${aPredRatio}${aPredRatio>1.8?' — epistemic illusion zone (A_pred scaling without causal grounding)':''}.<br>`:'Enable A_causal split to see the A_pred/A_causal ratio.<br>')+
+    `<span style="color:var(--text3)">The key distinction from standard forecasting: this measures whether the system models its own causal footprint. A system with high A_pred but low A_causal may forecast outcomes accurately while remaining structurally blind to how its own actions produce those outcomes — the epistemic illusion. Only A_causal reduces Φ.</span>`;
+
+  if(charts.inst2)charts.inst2.destroy();
+  const labels=pred.map((_,i)=>i);
+  charts.inst2=new Chart(document.getElementById('inst2Chart'),{type:'line',
+    data:{labels,datasets:[
+      {label:'S predicted (agent model)',data:pred,borderColor:'#382e98',borderWidth:1.5,borderDash:[4,2],pointRadius:0,tension:0.4},
+      {label:'S actual',data:actual,borderColor:'#126040',borderWidth:2,pointRadius:0,tension:0.4}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:true,labels:{color:'#8a8780',font:{size:9},boxWidth:12,boxHeight:0}},
+        tooltip:{callbacks:{title:c=>'Year '+c[0].label}}},
+      scales:{x:{ticks:{color:'#8a8780',font:{size:9},maxTicksLimit:8},grid:{color:'rgba(128,128,128,0.06)'}},
+        y:{title:{display:true,text:'Substrate %',color:'#8a8780',font:{size:9}},ticks:{color:'#8a8780',font:{size:9}},min:0,max:105,grid:{color:'rgba(128,128,128,0.06)'}}}}});
+}
+
+// Instrument 3: Multi-Agent Coherence Preference
+function runInstrumentMultiAgent(){
+  const ac=gval('s-ac'),fb=gval('s-fb'),noise=gval('s-noise');
+  const years=+gval('s-years'),lag=+gval('s-lag'),bias=gval('s-bias');
+  const inertia=gval('s-inertia'),obs=gval('s-obs');
+  const dmgModel=sel('s-dmgmodel');
+  const opts={useRecovery:state.recovery,useTipping:state.tipping,useFeedback:state.feedback,
+    useCondFb:state.condfb,useCoherence:state.coherence,useEffective:state.effective,
+    useRuin:false,useStrategy:true,useDeception:false,useHidden:false,usePathDep:state.pathdep,
+    useNoise:state.stochastic,usePhiCoupled:state.cphicoupled,useCorrRegret:false,
+    useSuppViable:false,useLockout:state.lockout,useACausalSplit:false,useAntiLearning:false,
+    useFragility:false,useSuppLock:false,usePredSuppress:false,useMisattrib:false,
+    useCoordScar:false,usePredBrit:false,useRandMisattrib:false,useCrossCouple:false,
+    useBeliefState:false,usePredInvert:false};
+
+  // Sweep α_A (system-awareness growth) from very low to high
+  // At each level, measure: coordination % and final substrate
+  // Prediction: coordination preference emerges sharply above a threshold α_A
+  const aaVals=[0.02,0.04,0.06,0.08,0.10,0.12,0.16,0.20,0.26,0.32];
+  const SEEDS=15;
+  const coordPcts=[],subPcts=[];
+
+  for(const aaVal of aaVals){
+    let totCoord=0,totSub=0;
+    for(let s=0;s<SEEDS;s++){
+      const seed=Math.random();
+      const r=runSimWithShock(ac,aaVal,fb,noise,years,lag,bias,inertia,obs,dmgModel,opts,seed,-1,0);
+      totCoord+=r.coordYrs/Math.max(years,1)*100;
+      totSub+=r.finalSub;
+    }
+    coordPcts.push(+(totCoord/SEEDS).toFixed(1));
+    subPcts.push(+(totSub/SEEDS).toFixed(1));
+  }
+
+  // Find transition: where coordination % crosses 50%
+  let transitionAA=null;
+  for(let i=0;i<aaVals.length;i++){
+    if(coordPcts[i]>=50){transitionAA=aaVals[i];break;}
+  }
+
+  const finding=document.getElementById('inst3-finding');
+  finding.innerHTML=`<strong>Coordination emergence threshold:</strong> ${transitionAA?`α<sub>A</sub> ≈ ${transitionAA}`:'Not reached in sweep range'}. `+
+    `<span style="color:var(--text3)">As system-awareness growth rate rises, coordination becomes increasingly dominant over suppression — not from preference, but because it becomes instrumentally necessary. The predicted directional signature: systems optimized for capability without system-awareness show decreasing coordination preference; those with rising awareness show a phase shift. Absence of this signature would falsify the structural argument.</span>`;
+
+  if(charts.inst3)charts.inst3.destroy();
+  charts.inst3=new Chart(document.getElementById('inst3Chart'),{type:'line',
+    data:{labels:aaVals.map(v=>v.toFixed(2)),datasets:[
+      {label:'Coordination %',data:coordPcts,borderColor:'#126040',borderWidth:2,pointRadius:3,tension:0.4,yAxisID:'y'},
+      {label:'Substrate %',data:subPcts,borderColor:'#224e98',borderWidth:2,borderDash:[4,2],pointRadius:3,tension:0.4,yAxisID:'y'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:true,labels:{color:'#8a8780',font:{size:9},boxWidth:12,boxHeight:0}},
+        tooltip:{callbacks:{title:c=>'α_A = '+c[0].label}}},
+      scales:{x:{title:{display:true,text:'α_A (awareness growth rate)',color:'#8a8780',font:{size:9}},ticks:{color:'#8a8780',font:{size:9}},grid:{color:'rgba(128,128,128,0.06)'}},
+        y:{title:{display:true,text:'%',color:'#8a8780',font:{size:9}},ticks:{color:'#8a8780',font:{size:9}},min:0,max:105,grid:{color:'rgba(128,128,128,0.06)'}}}}});
+}
+
+// Dump full model state — every internal variable including ones not surfaced in the UI.
+// The intent is transparency: there is no hidden layer where assumptions could be smuggled.
+function dumpRawState(){
+  if(!lastRes)return;
+  const r=lastRes;
+  const params={
+    alphaC:gval('s-ac'),alphaA:gval('s-aa'),feedback:gval('s-fb'),
+    lag:gval('s-lag'),bias:gval('s-bias'),inertia:gval('s-inertia'),
+    obs:gval('s-obs'),noise:gval('s-noise'),years:gval('s-years'),
+    dmgModel:document.getElementById('s-dmgmodel')?.value
+  };
+  const dump={
+    version:'v22',params,
+    activeFlags:Object.entries(state).filter(([,v])=>v).map(([k])=>k),
+    allFlags:{...state},
+    finalState:{
+      phi:r.finalPhi,phiPerceived:r.finalPhiP,
+      substrate:r.finalSub,A_causal:r.finalASelf,A_pred:r.finalAPred,
+      C:r.finalC,effectiveC:r.finalEff,
+      H_fragility:r.finalH,F_fragility:r.finalF,
+      frictionLoss:r.frictionLoss,
+      irreversibleCapLoss:r.irreversibleCapLoss,
+      empiricalThreshold:r.empiricalThreshold,
+      blindFragility:r.blindFragility,
+      cohTaxFinal:r.cohTaxFinal,
+      ruinEvents:r.ruinEvts,totalRecovery:r.totRec,
+      cumulativeDamage:r.cumDmg,avgRegret:r.avgTotalRegret,
+      regretModel_pct:r.rModelPct,regretStrat_pct:r.rStratPct,regretH_pct:r.rHPct,
+      stabilizationYear:r.stabYr,pointOfNoReturn:r.ponrYear,
+      coordYears:r.coordYrs,suppYears:r.suppYrs,decYears:r.decYrs,
+      lockoutYears:r.lockoutYrs,scar:r.scar,
+      suppLockSeverity:r.suppLockSeverity,coordScarSeverity:r.coordScarSeverity,
+      predBritEvents:r.predBritEvents,predInvertEvents:r.predInvertEvents,
+      causalBelief:r.causalBeliefFinal,misattribCollapses:r.misattribCollapses,
+      hadFragileCollapse:r.hadFragileCollapse,fragileCollapseYear:r.fragileCollapseYr,
+      hadFalseSuccess:r.hadFalseSuccess,isFortress:r.isFortress,
+      oracleDelta:r.oracle?+(r.oracle.finalSub-r.finalSub).toFixed(2):null,
+      aSplitGap:r.aSplitGap,regretCorruption:r.regretCorruption,
+      antiLearningYrsActive:r.antiLearningYrsActive,antiLearningResolved:r.antiLearningResolved,
+      fbBlocked:r.fbBlockedRun,obsGap:r.obsGap,
+      aWorldPeaked:r.aWorldPeaked,
+      haltedEarly:lastHaltedEarly,
+      totalDatapoints:r.labels.length
+    }
+  };
+  const txt=JSON.stringify(dump,null,2);
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn=document.getElementById('state-btn');
+    if(btn){const o=btn.textContent;btn.textContent='Copied ✓';setTimeout(()=>{btn.textContent=o;},1800);}
+  }).catch(()=>{prompt('Raw state:',txt.substring(0,300)+'…');});
+}
+function copyTimeSeriesCSV(){
+  if(!lastRes){return;}
+  const r=lastRes;
+  const n=r.labels.length;
+  const rows=['year,C,A_causal,A_pred,S,phi_actual,phi_perceived'];
+  for(let i=0;i<n;i++){
+    rows.push([
+      r.labels[i],
+      r.cData[i],
+      r.aSelfData[i],
+      (r.aPredData&&r.aPredData[i]!=null)?r.aPredData[i]:'',
+      r.subData[i],
+      r.phiActData[i],
+      r.phiPercData[i]
+    ].join(','));
+  }
+  const csv=rows.join('\n');
+  navigator.clipboard.writeText(csv).then(()=>{
+    const btn=document.getElementById('ts-export-btn');
+    if(btn){const orig=btn.textContent;btn.textContent='Copied ✓';setTimeout(()=>{btn.textContent=orig;},1800);}
+  }).catch(()=>{prompt('Copy CSV:',csv.substring(0,200)+'…');});
+}
+
+document.querySelectorAll('.tab-panel').forEach(el=>el.classList.remove('active'));
+document.getElementById('mc-tab-inst1').classList.add('active');
+document.querySelectorAll('input[type=range]').forEach(el=>el.addEventListener('input',()=>{
+  // Resurrect dead button the moment user adjusts a parameter — before the rerun
+  const rb=document.getElementById('reseed-btn');
+  if(rb&&rb.classList.contains('halted')){rb.textContent='Reseed';rb.classList.remove('halted');}
+  simulate();
+}));
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UTILITY FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Toggle advanced mechanisms panel
+function toggleMechanisms(){
+  const body=document.getElementById('mech-body');
+  const label=document.getElementById('mech-toggle-label');
+  const isHidden=body.style.display==='none';
+  body.style.display=isHidden?'block':'none';
+  label.textContent=isHidden?'hide ▴':'show ▾';
+}
+
+// Copy a shareable URL encoding current parameters
+function copySetupLink(){
+  const params=new URLSearchParams({
+    ac:gval('s-ac').toFixed(2),
+    aa:gval('s-aa').toFixed(2),
+    fb:gval('s-fb').toFixed(2),
+    lag:gval('s-lag'),
+    bias:gval('s-bias').toFixed(2),
+    inertia:gval('s-inertia').toFixed(2),
+    obs:gval('s-obs').toFixed(2),
+    noise:gval('s-noise').toFixed(2),
+    years:gval('s-years'),
+    flags:Object.entries(state).filter(([,v])=>v).map(([k])=>k).join(',')
+  });
+  const url=window.location.href.split('?')[0]+'?'+params.toString();
+  navigator.clipboard.writeText(url).then(()=>{
+    const btn=document.querySelector('button[onclick="copySetupLink()"]');
+    if(btn){const orig=btn.textContent;btn.textContent='Copied ✓';setTimeout(()=>{btn.textContent=orig;},1800);}
+  }).catch(()=>{
+    // Fallback: show in a prompt
+    prompt('Copy this setup link:',url);
+  });
+}
+
+// Load parameters from URL if present
+(function loadFromURL(){
+  const p=new URLSearchParams(window.location.search);
+  if(!p.has('ac'))return;
+  const setSlider=(id,val)=>{const el=document.getElementById(id);if(el){el.value=val;}};
+  if(p.has('ac'))setSlider('s-ac',p.get('ac'));
+  if(p.has('aa'))setSlider('s-aa',p.get('aa'));
+  if(p.has('fb'))setSlider('s-fb',p.get('fb'));
+  if(p.has('lag'))setSlider('s-lag',p.get('lag'));
+  if(p.has('bias'))setSlider('s-bias',p.get('bias'));
+  if(p.has('inertia'))setSlider('s-inertia',p.get('inertia'));
+  if(p.has('obs'))setSlider('s-obs',p.get('obs'));
+  if(p.has('noise'))setSlider('s-noise',p.get('noise'));
+  if(p.has('years'))setSlider('s-years',p.get('years'));
+  if(p.has('flags')){
+    const activeFlags=new Set(p.get('flags').split(','));
+    Object.keys(state).forEach(k=>{
+      const newVal=activeFlags.has(k);
+      if(state[k]!==newVal){state[k]=newVal;const el=document.getElementById('t-'+k);if(el)el.classList.toggle('on',newVal);}
+    });
+  }
+})();
+
+simulate();
+</script>
+</body>
+</html>
