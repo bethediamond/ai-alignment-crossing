@@ -1,7 +1,7 @@
 # Toy 03 — The Alignment Phase Ratio
 
 > *Part of **The Alignment of Intelligence** — a three-article series.*
-> **Article 3 is forthcoming.** This toy is a companion to Article 3: *The Crossing*.
+> This toy is a companion to [Article 3: The Crossing](https://medium.com/@diamondlight/iv-the-crossing-fba00eed5d1a).
 
 ---
 
@@ -111,9 +111,9 @@ Shareable parameter links are supported — click "Copy setup link" inside the s
 
 ---
 
-## Article (Coming Soon)
+## Article
 
-The full article — *The Alignment of Intelligence, Article 3: The Crossing* — is not yet published. This repository will be updated with a link when it goes live.
+[The Alignment of Intelligence, Article 3: The Crossing](https://medium.com/@diamondlight/iv-the-crossing-fba00eed5d1a)
 
 ---
 
