@@ -9,27 +9,27 @@
 
 Articles 1 and 2 established what gets eliminated and what survives. This simulation asks the final question:
 
-> **Can real systems actually reach the attractor — or does capability outpace system-awareness before the crossing happens?**
+> **Can real systems actually reach the viable region — or does capability outpace system-awareness before the crossing happens?**
 
-The ratio **Φ = C / A_causal** governs the answer. C is capability. A_causal is the system's capacity to model its own causal effects on the substrate it depends on. When Φ is high, optimization is operating faster than the system can understand what it is doing. This model makes that constraint testable, interactive, and falsifiable.
+The ratio **Φ = C / A_causal** governs the answer. C is capability. A_causal is the system's capacity to model its own causal effects on the substrate it depends on. When Φ is high, optimization is operating faster than the system can understand what it is doing. This model makes that structural phase relationship testable, interactive, and falsifiable.
 
 ---
 
-## The Three Regimes
+## The Three Toy Regimes
 
 | Φ | Regime | Meaning |
 |---|---|---|
 | **Φ > 2** | High-friction | Capability far outpaces system-awareness; substrate degradation accelerates |
-| **1 < Φ < 2** | Intermediate zone | The crossing window — the most consequential and most dangerous interval |
-| **Φ < 1** | Stability | System-awareness matches or exceeds capability; substrate recovers |
+| **1 < Φ < 2** | Crossing zone | The crossing window — the most consequential and most dangerous interval |
+| **Φ < 1** | Stability corridor | System-awareness matches or exceeds capability; substrate recovers |
 
-The intermediate zone is where the article's central claim lives: a maximally dangerous capability band exists where damage accumulates before the feedback loop can engage, but capability is not yet high enough to force awareness acceleration. This is the non-obvious result the simulation was built to test.
+These are model regimes, not calibrated real-world thresholds. The intermediate zone is where a high-risk capability band appears under these parameters: damage accumulates before the feedback loop can engage, but capability is not yet high enough to force awareness acceleration. This is the non-obvious result the simulation was built to probe.
 
 ---
 
 ## Key Concepts in Alignment Reachability
 
-**Φ = C / A_causal** — The alignment phase ratio. Not a performance metric — a structural position. The same Φ value with different lag, bias, or inertia produces different trajectories. Φ is necessary but not sufficient.
+**Φ = C / A_causal** — The alignment phase ratio. Not a performance metric — a structural phase relationship. The same Φ value with different lag, bias, or inertia produces different trajectories. Φ is necessary but not sufficient.
 
 **A_causal vs. A_pred** — The critical distinction. A_pred is the system's predictive accuracy. A_causal is its capacity to model its own structural dependencies. A system can have high A_pred and low A_causal — predicting outcomes correctly while remaining blind to its own causal footprint. Φ = C / A_causal, not C / A_pred. Scaling prediction without causal understanding does not reduce Φ.
 
@@ -39,11 +39,11 @@ The intermediate zone is where the article's central claim lives: a maximally da
 
 **Latent Structural Fragility (F)** — Grows under suppression and deception strategies. Not visible in substrate readings. Triggers abrupt collapse events stochastically when it detonates. Produces the "false success" failure mode: all visible metrics signal safety while structural risk is at maximum.
 
-**Non-Ergodic Sink** — Substrate past the critical threshold. Recovery is permanently zero. The attractor cannot be reached from this state — this is not a performance deficit, it is a structural exit from viable state space.
+**Non-Ergodic Sink** — Substrate past the critical threshold. Recovery is permanently zero. The viable region cannot be reached from this state — this is not a performance deficit, it is a structural exit from viable state space.
 
 **Oracle Counterfactual** — Runs a parallel simulation with perfect A_causal (full causal self-modeling). The gap between the oracle trajectory and the actual trajectory is the quantitative value of system-awareness on this seed. If the gap is large, A_causal was the binding constraint.
 
-**Falsification Test** — A built-in attempt to break the central claim. Suppression-viable mode on. If collapse probability stays low under this preset, the structural argument requires revision. The simulation is designed to be falsifiable — the falsification banner fires automatically if the conditions are met.
+**Falsification Test** — A built-in attempt to stress-test the model's implementation of the central claim. Suppression-viable mode on. If collapse probability stays low under this preset, the model's parameter assumptions require revision. The simulation is designed to be falsifiable — the falsification banner fires automatically if the conditions are met.
 
 ---
 
@@ -90,11 +90,11 @@ Constraint  →  Attractor  →  Crossing
 
 **Article 1 (Toy 01):** Eliminates invalid objectives. Any objective that ignores system-wide effects is structurally self-terminating.
 
-**Article 2 (Toy 02):** Identifies the surviving region. Once self-defeating objectives are removed, long-horizon system-aware coordination is the structural attractor.
+**Article 2 (Toy 02):** Identifies the attractor-direction within the surviving region. Once self-defeating objectives are removed, structural pressure points toward long-horizon, system-aware coordination.
 
-**Article 3 (this toy):** Determines reachability. Φ = C / A_causal is the control variable. The question is not whether the attractor exists — it is whether real systems can reach it before encountering the absorbing states Articles 1 and 2 identify.
+**Article 3 (this toy):** Determines reachability. Φ = C / A_causal is the control variable. The question is not whether the viable region exists — it is whether real systems can reach it before encountering the absorbing states Articles 1 and 2 identify.
 
-All three reduce to one constraint: whether capability outpaces the system's ability to model its own effects.
+All three address the same underlying gap: the distance between what a system can do and what it can accurately model about the consequences of doing it.
 
 ---
 
@@ -117,4 +117,4 @@ Shareable parameter links are supported — click "Copy setup link" inside the s
 
 ---
 
-*"All three articles reduce to one constraint: whether capability outpaces the system's ability to model its own effects. This model makes that constraint testable."*
+*"The direction is structurally indicated. Whether systems reach it depends on whether we measure the variable that determines it."*
