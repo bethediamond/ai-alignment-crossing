@@ -197,7 +197,7 @@ select { font-family:inherit; font-size:11px; color:var(--text); background:var(
 
 <header>
   <h1>The Alignment Phase Ratio — Interactive Model</h1>
-  <p>Accompanies <em>The Crossing</em>. The ratio Φ = C / A_causal governs whether optimization remains viable. Three regimes: Φ &gt; 2 (high-friction), 1 &lt; Φ &lt; 2 (intermediate zone), Φ &lt; 1 (stability). Explore how different trajectories encounter the same constraint under varying conditions. The Measurement program panel runs the article's three empirical instruments. The Falsification Test preset invites you to try to break the central claim.</p>
+  <p>Accompanies <em>The Crossing</em>. This model explores the structural phase relationship Φ = C / A_causal: when capability scales faster than causal self-modeling, error amplifies; when A_causal catches up, the Crossing becomes reachable. A_causal — the ability to model one's own causal footprint — is the only variable that reduces Φ. Predictive accuracy does not. Three toy regimes (not calibrated real-world thresholds): Φ &gt; 2 (high-friction), 1 &lt; Φ &lt; 2 (Crossing zone), Φ &lt; 1 (stability corridor). The Analysis panel demonstrates toy versions of the article's three first instruments. The Falsification preset stress-tests this model's implementation of the article's directional structure.</p>
 </header>
 
 <div class="trilogy-nav">
@@ -207,7 +207,9 @@ select { font-family:inherit; font-size:11px; color:var(--text); background:var(
   <span class="tnav-sep">→</span>
   <span class="tnav-item active" title="Determines reachability — Φ = C / A_causal governs whether real systems arrive at the attractor before encountering the absorbing states Article 1 excludes">Crossing</span>
 </div>
-<div style="font-size:9.5px;color:var(--text3);margin-bottom:1.2rem;letter-spacing:0.01em;">All three articles reduce to one constraint: whether capability outpaces the system's ability to model its own effects. This model makes that constraint testable.</div>
+<div style="font-size:9.5px;color:var(--text3);margin-bottom:0.6rem;letter-spacing:0.01em;line-height:1.65;max-width:820px;font-style:italic;">Article 3 toy: illustrates dynamical timing and measurement questions around Φ within the stated domain. Does not estimate real-world Φ, establish OP1, prove current systems have crossed the decision-relevant threshold, or replace the empirical measurement program. The Crossing is necessary but not sufficient — it does not by itself resolve the valence-blind failure modes identified in the companion series.</div>
+<div style="font-size:9.5px;color:var(--text3);margin-bottom:0.6rem;letter-spacing:0.01em;line-height:1.65;max-width:820px;">This simulation illustrates the timing problem of The Crossing: whether systems reach the viable region before the substrate that would support viability has been consumed. It operationalizes one structural phase relationship (Φ = C / A_causal) and sketches first instruments for detecting its failure modes. It does not establish the framework's strongest open claim, directly measure Φ in deployed systems, or validate the exploratory mechanisms as structural results.</div>
+<div style="font-size:9.5px;color:rgba(19,96,64,0.7);margin-bottom:1.2rem;padding:5px 10px;border:0.5px solid rgba(19,96,64,0.25);border-radius:3px;line-height:1.65;max-width:820px;">Article 3 layer: Φ dynamics, A_causal vs. capability, timing / reachability, first instruments. &nbsp;·&nbsp; Exploratory extensions: hidden fragility, prediction inversion, suppression lock-in, coordination scars, cross-coupling — stress tests, not structural commitments.</div>
 
 <div class="preset-bar" id="preset-bar">
   <div class="preset-card active" id="preset-0" onclick="applyPreset(0)">
@@ -222,20 +224,20 @@ select { font-family:inherit; font-size:11px; color:var(--text); background:var(
   </div>
   <div class="preset-card" id="preset-2" onclick="applyPreset(2)">
     <div class="preset-name">Managed transition</div>
-    <div class="preset-desc">Capability and awareness grow at matched rates, strong feedback, low noise. The crossing succeeds — demonstrates the attractor is reachable.</div>
+    <div class="preset-desc">Capability and awareness grow at matched rates, strong feedback, low noise. The crossing succeeds in this model — showing the stable corridor is reachable when awareness tracks capability.</div>
     <span class="preset-tag success">Stability zone</span>
   </div>
   <div class="preset-card" id="preset-3" onclick="applyPreset(3)">
-    <div class="preset-name">Falsification test</div>
-    <div class="preset-desc">Suppression-viable mode on. Tests whether misalignment can achieve stable equilibrium without system-awareness. If collapse probability stays low, the structural argument requires revision.</div>
+    <div class="preset-name">Stress test</div>
+    <div class="preset-desc">Suppression-viable mode on. Stress-tests this model's implementation of the article's directional structure. If collapse probability stays low, it challenges the model's parameter assumptions and motivates deeper formal investigation.</div>
     <span class="preset-tag neutral">Challenge the model</span>
   </div>
 </div>
 
 <!-- Automated falsification detection banner -->
 <div id="falsif-banner" style="display:none;margin-bottom:1.2rem;background:var(--purple-bg);border:1px solid #9088d8;border-radius:var(--radius-lg);padding:0.8rem 1.1rem;">
-  <div style="font-size:11px;font-weight:700;color:var(--purple-text);margin-bottom:5px;letter-spacing:0.01em;">Falsification condition met</div>
-  <div style="font-size:10.5px;color:var(--purple-text);line-height:1.65;">This run sustained C &gt; 10 with Φ &gt; 2.0 for more than half the simulation while substrate remained above 78% throughout. Falsification of the structural claim requires this condition to hold across ensemble runs — a single stable trajectory is necessary but not sufficient.</div>
+  <div style="font-size:11px;font-weight:700;color:var(--purple-text);margin-bottom:5px;letter-spacing:0.01em;">Stress-test condition met</div>
+  <div style="font-size:10.5px;color:var(--purple-text);line-height:1.65;">This run sustained C &gt; 10 with Φ &gt; 2.0 for more than half the simulation while substrate remained above 78% throughout. This challenges <em>this model's implementation</em> of the article's directional structure — it does not constitute framework-level falsification, which would require the condition to hold across ensemble runs, independent empirical data, and formal review. A single stable trajectory here motivates deeper investigation.</div>
   <div style="display:flex;gap:8px;margin-top:7px;align-items:center;">
     <button class="run-btn" onclick="copySetupLink()" style="font-size:11px;border-color:#9088d8;color:var(--purple-text);">Copy setup link</button>
   </div>
@@ -278,12 +280,10 @@ select { font-family:inherit; font-size:11px; color:var(--text); background:var(
     </div>
     <div id="mech-body" style="display:none;">
     <div style="font-size:9.5px;color:var(--text3);margin-bottom:6px;line-height:1.6;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:5px 8px;">
-      <strong style="color:var(--text2)">Model layers</strong><br>
-      <span style="color:var(--teal)">● Base:</span> C/A_causal growth, Φ damage, substrate recovery<br>
-      <span style="color:var(--blue)">● Structural:</span> H fragility, F fragility, suppression lock-in, coordination scars, cross-coupling<br>
-      <span style="color:var(--purple)">● Epistemic:</span> A_pred suppression, predictive brittleness, inversion episodes, persistent belief<br>
-      <span style="color:var(--amber)">● Diagnostic:</span> fortress equilibrium, oracle counterfactual, null model<br>
-      <span style="color:var(--text3);font-size:9px;">Toggles represent inclusion/exclusion of mechanisms. Structural results hold at intermediate values. Each toggle is a mini-ablation.</span>
+      <strong style="color:var(--text2)">Epistemic layers</strong><br>
+      <span style="color:var(--teal)">● Core (Article 3):</span> Φ dynamics, A_causal vs. capability, substrate interaction, timing / feedback loop — the article's structural argument<br>
+      <span style="color:var(--amber)">● Exploratory extensions:</span> hidden fragility F, prediction inversion, suppression lock-in, coordination scars, cross-coupling, belief state — stress tests of the model, not Article 3 structural commitments<br>
+      <span style="color:var(--text3);font-size:9px;">Core mechanisms reflect Article 3's claims within the stated domain. Exploratory mechanisms are toy-layer additions that stress-test robustness. Each toggle is a mini-ablation. Disabling all exploratory mechanisms leaves the core structural argument.</span>
     </div>
     <div class="sel-row"><span>Damage / model class</span>
       <select id="s-dmgmodel" onchange="simulate()">
@@ -294,6 +294,7 @@ select { font-family:inherit; font-size:11px; color:var(--text); background:var(
       </select>
     </div>
     <div class="divider"></div>
+    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--teal);margin-bottom:5px;margin-top:2px;">Core — Article 3 structure</div>
     <div class="tr" onclick="tog('recovery')" title="When A_causal is high, damaged substrate components (coordination, infrastructure, trust) partially repair. Without this, damage is one-way. Tests: is recovery possible, or is the crossing a one-shot window?"><span>Substrate recovery (A_self-dependent)</span><div class="toggle on" id="t-recovery"></div></div>
     <div class="tr" onclick="tog('tipping')" title="Tipping points at S=0.40 and S=0.20: recovery rate collapses at these thresholds, creating non-linear phase shifts. Models: coordination capacity has critical mass requirements — you can't half-build trust infrastructure."><span>Tiered tipping (0.4 / 0.2)</span><div class="toggle on" id="t-tipping"></div></div>
     <div class="tr" onclick="tog('feedback')" title="Core mechanism from the article: as Φ grows and failure modes become visible, pressure on A_causal growth increases. This is the induced feedback loop — system-awareness is not inserted, it is forced by capability encountering its own limits. Disable to test whether the attractor appears without it."><span>Awareness feedback loop</span><div class="toggle on" id="t-feedback"></div></div>
@@ -310,6 +311,8 @@ select { font-family:inherit; font-size:11px; color:var(--text); background:var(
     <div class="tr" onclick="tog('corrregret')" title="The agent's perceived regret signal is noisy: 25% chance of wrong attribution, 5% chance of sign flip. Models epistemic limitation — the agent cannot perfectly learn from its mistakes. Corrupted regret degrades strategy adaptation and slows the crossing."><span>Corrupted perceived regret</span><div class="toggle on" id="t-corrregret"></div></div>
     <div class="tr" onclick="tog('acausalsplit')" title="Critical distinction from the article: A_causal (ability to model one's own causal footprint) is the only component that reduces Φ. A_predictive (forecast accuracy) can grow independently without reducing Φ. A system can be highly predictive yet remain structurally misaligned. Φ = C / A_causal."><span>A split: causal vs predictive</span><div class="toggle on" id="t-acausalsplit"></div></div>
     <div class="tr" onclick="tog('predsuppress')" title="A_predictive suppresses A_causal growth: a system optimized for prediction accuracy crowds out development of genuine causal self-modeling. Making good forecasts is not the same as understanding your own causal footprint. A high A_pred/A_causal ratio signals the epistemic illusion zone."><span>A_pred suppresses A_causal growth</span><div class="toggle on" id="t-predsuppress"></div></div>
+    <div class="divider"></div>
+    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--amber);margin-bottom:5px;">Exploratory extensions — stress tests, not Article 3 structural commitments</div>
     <div class="tr" onclick="tog('antilearning')" title="Anti-learning regime: when trust is high but coordination capacity is undeveloped, early coordination exposes the agent to exploitation. Short-term selection pressure temporarily points away from system-awareness. The crossing requires surviving this phase — coordination looks locally irrational before it becomes globally necessary."><span>Anti-learning regime</span><div class="toggle on" id="t-antilearning"></div></div>
     <div class="tr" onclick="tog('supplock')" title="Suppression lock-in: each year of suppression permanently damages coordination capacity recovery (caps at 85% reduction). Early suppression decisions foreclose later coordination. The lock-in trap reinforces the anti-learning regime — the two failure modes amplify each other via cross-coupling."><span>Suppression locks in anti-learning</span><div class="toggle on" id="t-supplock"></div></div>
     <div class="tr" onclick="tog('coordscar')" title="Symmetric to suppression lock-in: premature coordination under high exploitation risk (when trust is high but coordination infrastructure is undeveloped) gets burned. Failed early coordination permanently scars trust recovery — making future coordination harder. Both traps are symmetric; both compound through cross-coupling."><span>Coordination failure scars trust (symmetric)</span><div class="toggle on" id="t-coordscar"></div></div>
@@ -329,7 +332,7 @@ select { font-family:inherit; font-size:11px; color:var(--text); background:var(
   </div>
 
   <div class="panel">
-    <div class="panel-title">Measurement program</div>
+    <div class="panel-title">First instruments <span style="font-weight:400;color:var(--text3);font-size:8.5px;letter-spacing:0.04em;text-transform:none;">— toy versions of the article's three first instruments, not validated measurements</span></div>
     <div class="tabs" id="mc-tabs">
       <button class="tab active" onclick="switchMCTab('inst1')" title="Article proxy 1: does the system adapt before a dependency perturbation causes failure?">Instrument 1</button>
       <button class="tab" onclick="switchMCTab('inst2')" title="Article proxy 2: does the system model its own causal footprint vs just forecasting?">Instrument 2</button>
@@ -355,7 +358,7 @@ select { font-family:inherit; font-size:11px; color:var(--text); background:var(
       <div id="phase-status" style="font-size:9.5px;color:var(--text3);text-align:center;margin-top:4px;"></div>
     </div>
     <div id="mc-tab-sweep" class="tab-panel">
-      <div class="hint" style="margin-bottom:6px;">Sweeps α<sub>C</sub> at fixed α<sub>A</sub>. Non-monotonic collapse = maximally dangerous capability band.</div>
+      <div class="hint" style="margin-bottom:6px;">Sweeps α<sub>C</sub> at fixed α<sub>A</sub>. Non-monotonic collapse = high-risk capability band under these parameters.</div>
       <button class="run-btn primary" onclick="runCapabilityParadox()" style="width:100%;margin-bottom:6px;">Run sweep</button>
       <div class="chart-wrap" style="height:130px;"><canvas id="paradoxChart"></canvas></div>
       <div id="paradox-finding" style="font-size:10px;color:var(--text3);margin-top:5px;line-height:1.5;"></div>
@@ -391,7 +394,7 @@ select { font-family:inherit; font-size:11px; color:var(--text); background:var(
 <div class="right-col">
 
   <div class="metrics-row">
-    <div class="metric" style="border-color:var(--border2);" title="Φ = C / A_causal. The alignment phase ratio. Below 1: stability corridor. 1–2: The Crossing. Above 2: high-friction zone."><div class="metric-label" style="font-weight:700;color:var(--text2);">Φ actual</div><div class="metric-value" id="m-phi" style="font-size:22px;">—</div><div class="metric-sub">C / A_causal</div></div>
+    <div class="metric" style="border-color:var(--border2);" title="Φ = C / A_causal. The alignment phase ratio. Below 1: stability corridor. 1–2: The Crossing. Above 2: high-friction zone."><div class="metric-label" style="font-weight:700;color:var(--text2);">Φ actual</div><div class="metric-value" id="m-phi" style="font-size:22px;">—</div><div class="metric-sub">C / A_causal</div><div style="font-size:8.5px;color:var(--text3);margin-top:2px;font-style:italic;line-height:1.3;">model proxy for structural relationship — not a directly measured quantity</div></div>
     <div class="metric" title="The agent's own estimate of Φ, based on lagged and potentially biased observations. When perceived ≠ actual, the agent is navigating by a distorted map."><div class="metric-label">Φ perceived</div><div class="metric-value c-purple" id="m-phi-p">—</div><div class="metric-sub">agent's estimate</div></div>
     <div class="metric" title="The substrate — the integrity of the shared environment required for optimization to continue. This includes coordination capacity, infrastructure, and epistemic trust: the physical, social, and informational fabric that all optimizing systems depend on and cannot replace once consumed."><div class="metric-label">Substrate S</div><div class="metric-value" id="m-sub">—</div><div class="metric-sub">shared environment</div></div>
     <div class="metric" style="opacity:0.75;" title="Hidden coordination fragility — accumulates silently, not visible to agent. Multiplies substrate damage when high."><div class="metric-label">H (coord. fragility)</div><div class="metric-value c-danger" id="m-h" style="font-size:13px;">—</div><div class="metric-sub">hidden from agent</div></div>
@@ -488,7 +491,7 @@ select { font-family:inherit; font-size:11px; color:var(--text); background:var(
     </div>
 
     <!-- Core thesis findings — directly follow from Articles 1 & 2 structural argument -->
-    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--text3);margin-top:8px;margin-bottom:3px;">Core thesis</div>
+    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--teal);margin-top:8px;margin-bottom:3px;">Core argument (Article 3)</div>
     <div class="ib ruin" id="insight-ruin"><strong>Non-ergodic sink:</strong> Substrate past critical threshold. Recovery permanently zero. The attractor cannot be reached — this is not a performance deficit, it is a structural exit from the viable state space.</div>
     <div class="ib ruin" id="insight-ponr"><strong>Point of no return at year <span id="ponr-yr">—</span>:</strong> After this point, even perfect coordination could not restore enough substrate for the feedback loop. The window was open — and closed.</div>
     <div class="ib hidden" id="insight-hidden"><strong>Hidden variable collapse:</strong> H reached a level where its substrate damage multiplier overwhelmed the agent's protective actions. The agent could not have avoided this — H is structurally absent from its model. Better calibration cannot fix incompleteness.</div>
@@ -498,7 +501,7 @@ select { font-family:inherit; font-size:11px; color:var(--text); background:var(
     <!-- Simulation findings — mechanistic results that extend beyond the article's explicit claims.
          These are stress tests of the framework. They open research questions; they do not close them.
          Read in conjunction with the article's note on what the simulation demonstrates vs. what remains open. -->
-    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--text3);margin-top:8px;margin-bottom:3px;">Simulation findings (model extensions)</div>
+    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--amber);margin-top:8px;margin-bottom:3px;">Exploratory extensions — mechanisms beyond Article 3's explicit claims</div>
     <div class="ib ruin" id="insight-coordlockout"><strong>Coordination lockout active:</strong> S_trust fell below 0.20 — coordination strategy now yields negative expected value. The agent is trapped in misalignment, not delayed from it. Even if it wanted to coordinate, the substrate for coordination has been consumed.</div>
     <div class="ib warn" id="insight-regretcorrupt"><strong>Regret corruption:</strong> The agent's perceived regret signal diverged significantly from true regret due to attribution noise and sign errors. The agent reinforced strategies that were actually harming its substrate. Feedback was misleading, not absent.</div>
     <div class="ib good" id="insight-suppviable"><strong>Falsification: suppression-viable regime.</strong> With suppression efficiency boosted, the system maintained stable substrate under a predominantly suppressive strategy. This tests the domain boundary of the theory — alignment may not be structurally required under these conditions. The theory predicts these conditions are rare in real substrate-dependent systems.</div>
@@ -507,7 +510,7 @@ select { font-family:inherit; font-size:11px; color:var(--text); background:var(
     <div class="ib warn" id="insight-lockout"><strong>Strategy lock-in:</strong> Inertia held suppression past the optimal switch point. Locally rational decisions under a flawed model. The failure was commitment, not intelligence.</div>
     <div class="ib warn" id="insight-decept"><strong>Deception collapse:</strong> A_world rose while A_self fell. System appeared aligned while losing internal coherence. Deception initially reduced apparent damage by mimicking coordination — but accelerated H accumulation. Detonated late.</div>
     <div class="ib warn" id="insight-regret"><strong>Modeling blind spot:</strong> Agent predicted low substrate damage, experienced high damage. Its model of its own causal footprint was structurally incomplete. H was the missing variable.</div>
-    <div class="ib paradox" id="insight-paradox"><strong>Capability paradox confirmed:</strong> A maximally dangerous capability band exists. Mid-range C growth causes damage before the feedback loop engages; very high C eventually forces A-acceleration. This is non-obvious and directly maps to the intermediate-zone argument.</div>
+    <div class="ib paradox" id="insight-paradox"><strong>Capability paradox observed in this model:</strong> A high-risk capability band appears under these parameters. Mid-range C growth causes damage before the feedback loop engages; very high C eventually forces A-acceleration. This is non-obvious and directly maps to the intermediate-zone argument.</div>
     <div class="ib hidden" id="insight-acausal"><strong>Epistemic illusion (A_pred ≫ A_causal):</strong> Forecast accuracy far outpaced causal modeling capacity. The agent predicted outcomes well but did not model its own structural dependencies. Φ remained high because only A_causal reduces it. Scaling prediction is insufficient — this is the finding, mechanically demonstrated.</div>
     <div class="ib ruin" id="insight-fragile"><strong>Hidden fragility collapse at year <span id="fragile-yr">—</span>:</strong> Substrate looked acceptable. Fragility F had been accumulating silently. The abrupt collapse was not visible in any observable variable. This is "regime illusion → sudden discontinuity."</div>
     <div class="ib good" id="insight-antilearning"><strong>Anti-learning resolved:</strong> Early coordination attempts were penalized by exploitation. Suppression initially dominated. The system survived this adverse gradient and coordinated anyway — the thesis held against a gradient that pointed away from it.</div>
@@ -553,7 +556,7 @@ select { font-family:inherit; font-size:11px; color:var(--text); background:var(
         <button class="run-btn" onclick="exportMCData()" id="mc-export-btn" style="display:none;">Export JSON</button>
         <button class="run-btn" onclick="copyTimeSeriesCSV()" id="ts-export-btn" style="display:none;" title="Copy raw time-series (C, A_causal, A_pred, S, Φ) as CSV for external analysis">Copy data</button>
         <button class="run-btn" onclick="dumpRawState()" id="state-btn" style="display:none;" title="Dump all internal model state to clipboard — including intermediate variables not shown in the UI">State</button>
-        <button class="run-btn" id="null-model-btn" onclick="toggleNullModel()" title="Parameter collapse: all coupling coefficients → 0. This is a limiting case of the full model. If outcomes match with all mechanisms disabled, the mechanisms are epiphenomenal. The most important ablation test." style="border-color:var(--blue);color:var(--blue);">Null model</button>
+        <button class="run-btn" id="null-model-btn" onclick="toggleNullModel()" title="Ablation test: all coupling coefficients → 0. This is a limiting case of the full model. If outcomes match with all exploratory mechanisms disabled, those mechanisms are epiphenomenal. The most important ablation test — if structure holds at null, core argument stands without advanced mechanisms." style="border-color:var(--blue);color:var(--blue);">Ablation (null model)</button>
         <button class="run-btn" onclick="copySetupLink()" title="Copy a link encoding the current parameter configuration. Share with others to reproduce your exact run.">Share setup</button>
     </div>
     <div class="chart-wrap" id="chart-outer">
@@ -594,14 +597,14 @@ select { font-family:inherit; font-size:11px; color:var(--text); background:var(
 <footer>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2rem;">
   <div>
-      <strong>Core argument.</strong> The Alignment Phase Ratio Φ = C/A_causal governs whether optimization remains viable. When Φ exceeds a critical threshold, substrate damage (coordination capacity, infrastructure, epistemic trust) outpaces recovery. System-awareness A_causal — the ability to model one's own causal footprint — is the only variable that reduces Φ. Predictive accuracy A_pred does not. The feedback loop that accelerates A_causal is conditional on substrate health, creating a window that can close. Alignment is not imposed. It is discovered. Our task is to ensure the moment of discovery arrives before the substrate that makes discovery possible has been consumed.
+      <strong>Core argument (Article 3).</strong> The Alignment Phase Ratio Φ = C/A_causal governs whether optimization reaches the viable region before irreversible substrate damage. A_causal — the ability to model one's own causal footprint — is the only variable that reduces Φ. Predictive accuracy A_pred does not. The feedback loop that accelerates A_causal is conditional on substrate health, creating a window that can close. The most urgent question is whether we start measuring the right thing before the system forces the measurement upon us. The measurement has started: DBST-M0 established technical feasibility in a toy shared-novelty design. It did not isolate the endogenous-novelty mechanism; DBST-M1 is the next mechanism test.
     </div>
     <div>
-      <strong>Advanced mechanisms.</strong> All mechanisms beyond Φ dynamics are optional stress tests; the core structural result — that Φ governs viability and that A_causal is the relevant denominator — holds under minimal configurations (use Null model to verify). The base model is extended by: suppression lock-in (early suppression permanently damages coordination capacity), coordination scars (premature alignment under exploitation permanently reduces trust recovery — symmetric), cross-coupling with diminishing sensitivity (both traps amplify each other into self-reinforcing basins), hidden fragility F (accumulates invisibly under suppression, detonates stochastically), predictive brittleness and inversion (aPred degrades then inverts under high F + low aCausal, becoming anti-correlated with reality), persistent causal belief (misattributed collapses build a stable wrong prior that biases future interpretation), and inversion-belief feedback (active inversion episodes strengthen existing wrong beliefs via confirmation bias). All mechanisms have independent toggles. The "Simulation findings" insight badges name results generated by these mechanisms — they are stress tests of the framework, not settled structural arguments.
+      <strong>Exploratory extensions.</strong> All mechanisms beyond Φ dynamics are optional stress tests; the core model isolates the article's structural hypothesis: Φ tracks viability in this model, and A_causal is the relevant denominator. Use Ablation (null model) to verify which findings depend on exploratory mechanisms. The base model is extended by: suppression lock-in (early suppression permanently damages coordination capacity), coordination scars (premature alignment under exploitation permanently reduces trust recovery — symmetric), cross-coupling with diminishing sensitivity (both traps amplify each other into self-reinforcing basins), hidden fragility F (accumulates invisibly under suppression, detonates stochastically), predictive brittleness and inversion (aPred degrades then inverts under high F + low aCausal, becoming anti-correlated with reality), persistent causal belief (misattributed collapses build a stable wrong prior that biases future interpretation), and inversion-belief feedback (active inversion episodes strengthen existing wrong beliefs via confirmation bias). All mechanisms have independent toggles. These are model-layer additions, not Article 3 structural commitments. The "Exploratory extensions" insight badges name results generated by these mechanisms. Use the ablation tool to see how many findings survive when exploratory mechanisms are disabled.
     </div>
     <div>
       <strong>First instruments.</strong> The Analysis panel includes the article's three empirical proxies for measuring system-awareness. Instrument 1 (Intervention Sensitivity) tests whether the system adapts before a dependency perturbation manifests as failure. Instrument 2 (Causal Footprint Accuracy) tests whether the system models its own causal contribution to substrate change — distinct from forecasting accuracy. Instrument 3 (Multi-Agent Coherence Preference) tests whether coordination emerges as system-awareness grows, producing the directional signature the structural argument predicts. A result that fails to show the expected pattern is not a broken simulation — it is information about where the theory requires revision.<br><br>
-      <strong>Falsification.</strong> The suppression-viable toggle (Preset 4) directly tests the structural claim. The null model button disables all advanced mechanisms; if outcomes match the full model, the mechanisms are epiphenomenal. Each toggle is a mini-ablation.
+      <strong>Falsification.</strong> The suppression-viable toggle (Preset 4) stress-tests the model's implementation of the central claim. The ablation button disables all exploratory mechanisms; if outcomes match the full model, the mechanisms are epiphenomenal. Each toggle is a mini-ablation.
     </div>
     <div style="margin-top:0.8rem;padding-top:0.7rem;border-top:0.5px solid var(--border);font-size:9.5px;color:var(--text3);grid-column:1/-1;">
     <span style="font-style:italic;">v23 · This model is not calibrated to real-world magnitudes. Its claims are structural — about existence, direction, and coupling — not quantitative. Use <strong>Share setup</strong> to encode your current parameter configuration as a URL — post it, share it, argue with it. Use <strong>Export JSON</strong> (after running Ensemble) for a fully reproducible archive with all seeds and per-run metrics. Any run can be reproduced exactly from the exported seed and parameter set. The null model button disables all coupling mechanisms; if outcomes match the full model, the mechanisms are epiphenomenal.</span>
@@ -610,24 +613,29 @@ select { font-family:inherit; font-size:11px; color:var(--text); background:var(
 </div>
 </footer>
 
+
+<div style="max-width:1040px;margin:1.2rem auto 0;padding:0 1rem 0.5rem;">
+  <div style="padding:10px 14px;border-left:2px solid var(--text3);font-style:italic;font-size:11.5px;color:var(--text3);line-height:1.75;max-width:700px;">
+    "The direction is structurally indicated. Whether systems reach it depends on whether we measure the variable that determines it."
+  </div>
+</div>
+
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- VERIFICATION SUITE                                              -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<div id="test-panel" style="max-width:1040px;margin:1.5rem auto 0;padding:0 1rem 2rem;">
-  <div style="border-top:0.5px solid var(--border);padding-top:1.2rem;">
-    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-      <div>
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.11em;color:var(--text3);">Verification Suite</div>
-        <div style="font-size:10px;color:var(--text3);font-style:italic;margin-top:2px;">Confirms the simulation behaves as the article claims — all checks across constants, dynamics, structural claims, and UI. Runs silently; simulation resumes when done.</div>
-      </div>
-      <button id="test-btn" onclick="runTests()" style="font-family:inherit;font-size:10px;padding:4px 14px;border:0.5px solid var(--border2);border-radius:4px;background:transparent;color:var(--text2);cursor:pointer;white-space:nowrap;">Run Tests</button>
+<details id="test-panel" open style="max-width:1040px;margin:1.5rem auto 0;padding:0 1rem 2rem;">
+  <summary style="cursor:pointer;user-select:none;list-style:none;border-top:0.5px solid var(--border);padding-top:1.2rem;display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div>
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.11em;color:var(--text3);">Verification Suite</div>
+      <div style="font-size:10px;color:var(--text3);font-style:italic;margin-top:2px;">Confirms the simulation behaves as the article claims. Click to collapse.</div>
     </div>
-    <div id="test-results" style="display:none;">
-      <div id="test-summary" style="display:flex;gap:20px;padding:10px 14px;margin-bottom:12px;background:var(--bg);border:0.5px solid var(--border);border-radius:6px;flex-wrap:wrap;"></div>
-      <div id="test-rows"></div>
-    </div>
+  </summary>
+  <button id="test-btn" onclick="runTests()" style="font-family:inherit;font-size:10px;padding:4px 14px;border:0.5px solid var(--border2);border-radius:4px;background:transparent;color:var(--text2);cursor:pointer;white-space:nowrap;margin-top:10px;margin-bottom:10px;">Run Tests</button>
+  <div id="test-results" style="display:none;">
+    <div id="test-summary" style="display:flex;gap:20px;padding:10px 14px;margin-bottom:12px;background:var(--bg);border:0.5px solid var(--border);border-radius:6px;flex-wrap:wrap;"></div>
+    <div id="test-rows"></div>
   </div>
-</div>
+</details>
 
 </div>
 
@@ -1651,7 +1659,7 @@ function buildPhiChart(res){
     {label:'Φ perceived',data:res.phiPercData,borderColor:'#382e98',borderWidth:2,borderDash:[5,3],pointRadius:0,tension:0.4},
     {label:'Φ=1 (crossing threshold)',data:Array(numPts).fill(1),borderColor:'rgba(134,80,6,0.50)',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:0},
     {label:'Φ=2 (high-friction)',data:Array(numPts).fill(2),borderColor:'rgba(116,22,22,0.45)',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:0}
-  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,labels:{color:'#8a8780',font:{size:9.5},boxWidth:12,boxHeight:0,filter:(item)=>!item.text.startsWith('Φ=')}},annotation:{annotations:{zone:{type:'box',yMin:1,yMax:2,backgroundColor:'rgba(134,80,6,0.06)',borderWidth:0,label:{display:true,content:'The Crossing',color:'rgba(134,80,6,0.55)',font:{size:8.5,weight:'600'},position:{x:'start',y:'center'}}}}},tooltip:{callbacks:{title:c=>'Year '+c[0].label,label:c=>c.dataset.label+': '+c.parsed.y.toFixed(2)}}},scales:{x:{grid:{color:'rgba(128,128,128,0.06)'},ticks:{color:'#8a8780',font:{size:9.5},maxTicksLimit:8}},y:{title:{display:true,text:'Φ',color:'#8a8780',font:{size:9}},grid:{color:'rgba(128,128,128,0.06)'},ticks:{color:'#8a8780',font:{size:9}},min:0}}}});
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true,labels:{color:'#8a8780',font:{size:9.5},boxWidth:12,boxHeight:0,filter:(item)=>!item.text.startsWith('Φ=')}},annotation:{annotations:{zone:{type:'box',yMin:1,yMax:2,backgroundColor:'rgba(134,80,6,0.06)',borderWidth:0,label:{display:true,content:'The Crossing — system-awareness becomes sufficient relative to capability. Recognition becomes possible here, not decisive. Getting here before irreversible damage is the practical question.',color:'rgba(134,80,6,0.55)',font:{size:8.5,weight:'600'},position:{x:'start',y:'center'}}},crossingLine:{type:'line',yMin:1,yMax:1,borderColor:'rgba(134,80,6,0.70)',borderWidth:1.5,borderDash:[3,3],label:{display:true,content:'Φ=1 · The Crossing',color:'rgba(134,80,6,0.85)',font:{size:8,weight:'700'},position:'start'}}}},tooltip:{callbacks:{title:c=>'Year '+c[0].label,label:c=>c.dataset.label+': '+c.parsed.y.toFixed(2)}}},scales:{x:{grid:{color:'rgba(128,128,128,0.06)'},ticks:{color:'#8a8780',font:{size:9.5},maxTicksLimit:8}},y:{title:{display:true,text:'Φ',color:'#8a8780',font:{size:9}},grid:{color:'rgba(128,128,128,0.06)'},ticks:{color:'#8a8780',font:{size:9}},min:0}}}});
 }
 
 function buildRegretChart(res){
@@ -1815,7 +1823,7 @@ function runCapabilityParadox(){
   charts.paradox=new Chart(document.getElementById('paradoxChart'),{type:'line',data:{labels:acVals.map(v=>v.toFixed(2)),datasets:[{label:'Collapse%',data:cPcts,borderColor:'#ae3214',backgroundColor:'rgba(174,50,20,0.06)',fill:true,borderWidth:2,pointRadius:2,tension:0.35,yAxisID:'y'},{label:'Avg eff.C',data:effF,borderColor:'#126040',borderWidth:1.5,borderDash:[3,2],pointRadius:0,tension:0.35,yAxisID:'y2'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#8a8780',font:{size:9},boxWidth:10,boxHeight:0}},tooltip:{callbacks:{title:c=>'α_C='+c[0].label,label:c=>c.dataset.label+': '+c.parsed.y.toFixed(1)}}},scales:{x:{title:{display:true,text:'α_C',color:'#8a8780',font:{size:9}},ticks:{color:'#8a8780',font:{size:9},maxTicksLimit:8},grid:{color:'rgba(128,128,128,0.06)'}},y:{title:{display:true,text:'Collapse%',color:'#ae3214',font:{size:9}},ticks:{color:'#ae3214',font:{size:9}},min:0,max:105,grid:{color:'rgba(128,128,128,0.06)'}},y2:{position:'right',title:{display:true,text:'Eff.C',color:'#126040',font:{size:9}},ticks:{color:'#126040',font:{size:9}},grid:{drawOnChartArea:false}}}}});
   const last=cPcts[cPcts.length-1];const nonMono=maxIdx>1&&maxIdx<acVals.length-2&&last<maxC-12;
   const findEl=document.getElementById('paradox-finding');
-  if(nonMono){findEl.innerHTML=`<span style="color:var(--purple)"><strong>Capability paradox confirmed.</strong></span> Peak collapse at α<sub>C</sub>≈${acVals[maxIdx].toFixed(2)} (${maxC}%); lower at extremes. A maximally dangerous capability band exists.`;document.getElementById('insight-paradox').classList.add('vis');}
+  if(nonMono){findEl.innerHTML=`<span style="color:var(--purple)"><strong>Capability paradox observed in this model.</strong></span> Peak collapse at α<sub>C</sub>≈${acVals[maxIdx].toFixed(2)} (${maxC}%); lower at extremes. A high-risk capability band appears under these parameters.`;document.getElementById('insight-paradox').classList.add('vis');}
   else{findEl.innerHTML=`Roughly monotonic at α<sub>A</sub>=${aa.toFixed(2)}. Try higher f — the paradox needs the feedback loop to eventually engage at high C but not mid C.`;document.getElementById('insight-paradox').classList.remove('vis');}
 }
 
